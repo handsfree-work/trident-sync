@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trident-sync"
-version = "1.0.1"
+version = "1.0.2"
 description = "三叉戟，异构项目同步升级工具，The heterogeneous repo sync and upgrade CLI"
 authors = ["xiaojunnuo <xiaojunnuo@qq.com>"]
 license = "MIT"
@@ -8,16 +8,20 @@ readme = "README.md"
 packages = [{ include = "lib" }, { include = "cli.py" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-docopt = "*"
-gitpython = "*"
-PyYaml = "*"
-requests = "*"
+python = ">=3.8,<4"
 loguru = "^0.6.0"
+docopt = "^0.6.2"
+gitpython = "^3.1.30"
+pyyaml = "^6.0"
+requests = "^2.28.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [tool.poetry.scripts]
 trident = "cli:cli"

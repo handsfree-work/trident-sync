@@ -89,7 +89,7 @@ src
 
 ```shell
 # 安装本工具
-pip install trident-sync
+pip install trident-sync --upgrade
 # 创建一个同步目录，用来进行同步操作,你可以任意命名
 mkdir project-sync
 # 进入目录
