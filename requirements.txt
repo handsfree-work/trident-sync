@@ -1,0 +1,4 @@
+docopt
+gitpython
+PyYaml
+requests
