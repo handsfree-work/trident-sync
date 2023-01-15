@@ -8,7 +8,7 @@ repo: # 仓库列表
     path: "fs-server-js"              # submodule保存路径
     branch: "main"                    # 要同步过来的分支
   test: # 你的项目（接受同步项目），可以任意命名
-    url: "https://github.com/greper/trident-test"           # 仓库地址
+    url: "https://github.com/handsfree-work/trident-test"           # 仓库地址
     path: "target"                    # submodule子路径
     branch: "main"                    # 你的代码开发主分支（接受合并的分支）例如dev、main等
     token: ""                         # 仓库token，用于提交PR, 前往 https://github.com/settings/tokens 创建token

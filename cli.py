@@ -11,9 +11,9 @@ Options:
     -h,--help  显示帮助菜单
     -c,--config=CONFIG  配置文件  [default: sync.yaml]
     -r,--root=ROOT  根目录  [default: .]
-    -t,--token=TOKEN PR token
+    -t,--token=TOKEN   PR token
 Example:
-    trident init -r . -c sync.yaml
+    trident init
     trident sync
     trident remote https://github.com/greper/trident-test
 """
@@ -40,27 +40,27 @@ def cli():
     """
     异构仓库同步升级工具入口
     """
-    print('''
-            ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
-            ψ  ████████╗██████╗ ██╗██████╗ ███████╗███╗   ██╗████████╗  ψ
-            ψ  ╚══██╔══╝██╔══██╗██║██╔══██╗██╔════╝████╗  ██║╚══██╔══╝  ψ
-            ψ     ██║   ██████╔╝██║██║  ██║█████╗  ██╔██╗ ██║   ██║     ψ
-            ψ     ██║   ██╔══██╗██║██║  ██║██╔══╝  ██║╚██╗██║   ██║     ψ
-            ψ     ██║   ██║  ██║██║██████╔╝███████╗██║ ╚████║   ██║     ψ
-            ψ     ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     ψ 
-            ψ      https://github.com/handsfree-work/trident-sync       ψ
-            ψ              Don't be stingy with your star               ψ
-            ψ                    请不要吝啬你的star哟                     ψ
-            ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
-    ''')
     args = docopt(__doc__)
+    print('''
+                ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
+                ψ  ████████╗██████╗ ██╗██████╗ ███████╗███╗   ██╗████████╗  ψ
+                ψ  ╚══██╔══╝██╔══██╗██║██╔══██╗██╔════╝████╗  ██║╚══██╔══╝  ψ
+                ψ     ██║   ██████╔╝██║██║  ██║█████╗  ██╔██╗ ██║   ██║     ψ
+                ψ     ██║   ██╔══██╗██║██║  ██║██╔══╝  ██║╚██╗██║   ██║     ψ
+                ψ     ██║   ██║  ██║██║██████╔╝███████╗██║ ╚████║   ██║     ψ
+                ψ     ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     ψ 
+                ψ      https://github.com/handsfree-work/trident-sync       ψ
+                ψ              Don't be stingy with your star               ψ
+                ψ                    请不要吝啬你的star哟                      ψ
+                ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
+        ''')
     root = get_root(args)
     config = read_config(root, args)
 
     if args['init']:
         handle_init(root, config)
-    elif args['start']:
-        handle_start(root, config, args)
+    elif args['sync']:
+        handle_sync(root, config, args)
     elif args['remote']:
         handle_remote(root, config, args)
     else:
@@ -102,6 +102,14 @@ def handle_init(root, config):
     conf_options = config['options']
     conf_repo_root = conf_options['repo_root']
     for key in conf_repos:
+        added = False
+        for module in sms:
+            if key == module.name:
+                logger.info(f"{key} 已经加入submodule")
+                added = True
+                break
+        if added:
+            continue
         item = conf_repos[key]
         logger.info(f"add submodule:{item['url']}")
         path = f"{conf_repo_root}/{item['path']}"
@@ -144,9 +152,9 @@ def check_need_push(repo, branch):
     return True
 
 
-def handle_start(root, config, args):
+def handle_sync(root, config, args):
     """
-    处理 start 命令
+    处理 sync 命令
     """
     logger.info(f"--------------------- 开始同步 ---------------------∈")
     repo = git.Repo.init(path=root)
