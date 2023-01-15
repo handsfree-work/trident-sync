@@ -90,7 +90,7 @@ src
 ```shell
 # 安装本工具
 pip install trident-sync
-# 创建一个同步目录，用来进行同步操作
+# 创建一个同步目录，用来进行同步操作,你可以任意命名
 mkdir project-sync
 # 进入目录
 cd project-sync
@@ -108,9 +108,10 @@ cd project-sync
 然后将`sync.yaml`中配置的多个`repo` 添加为`submodule`
 
 ```shell
-# 执行初始化操作,只需要运行一次即可
+# 执行初始化操作
 trident init 
 ```
+> 注意：只需运行一次即可，除非你添加了新的`repo`
 
 ### 4.4 进行同步
 
@@ -125,9 +126,11 @@ trident sync
 
 将`project-sync`提交到你的远程服务器，防止更换电脑丢失同步进度
 
+后续你可以在任意位置`clone`出`project-sync`之后，运行`trident sync`即可继续同步
+
 ```shell
 # 执行初始化操作
-trident remote <project-sync_git_url> 
+trident remote --url=<project-sync_git_url> 
 ```
 
 > 注意：这个 `<project-sync_git_url>` 是一个全新的git仓库，用来保存同步进度的

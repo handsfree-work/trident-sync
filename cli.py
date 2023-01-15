@@ -6,17 +6,18 @@
 Usage:
     trident init [-r ROOT] [-c CONFIG]
     trident sync [-r ROOT] [-c CONFIG] [-t token]
-    trident remote <url> [-r ROOT]
+    trident remote [-r ROOT] [-u URL]
     trident -h
 Options:
     -h,--help           显示帮助菜单
     -c,--config=CONFIG  配置文件  [default: sync.yaml]
     -r,--root=ROOT      根目录  [default: .]
     -t,--token=TOKEN    PR token
+    -u,--url=URL        远程地址
 Example:
     trident init
     trident sync
-    trident remote https://github.com/handsfree-work/trident-test-sync
+    trident remote --url=https://github.com/handsfree-work/trident-test-sync
 """
 import datetime
 import logging
@@ -360,9 +361,9 @@ def do_task(args, root, conf_options, conf_repo, conf_sync, key, sms, status, ht
 def handle_remote(root, args):
     repo = git.Repo(path=root)
     cur_branch_name = repo.head.reference
-    url = args['<url>']
+    url = args['--url']
     if 'origin' not in repo.remotes and not url:
-        logger.info("请先通过 trident remote <sync_git_url> 命令设置远程地址")
+        logger.info("请先通过 trident remote --url=<sync_git_url> 命令设置远程地址")
         return
     if url:
         if 'origin' in repo.remotes:
