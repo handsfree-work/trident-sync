@@ -5,7 +5,7 @@
     1. 安装git
 Usage:
     trident init [-r ROOT] [-c CONFIG]
-    trident start [-r ROOT] [-c CONFIG] [-t token]
+    trident sync [-r ROOT] [-c CONFIG] [-t token]
     trident remote [-r ROOT] <url>
 Options:
     -h,--help  显示帮助菜单
@@ -14,7 +14,7 @@ Options:
     -t,--token=TOKEN PR token
 Example:
     trident init -r . -c sync.yaml
-    trident start
+    trident sync
     trident remote https://github.com/greper/trident-test
 """
 import datetime

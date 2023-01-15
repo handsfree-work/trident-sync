@@ -99,7 +99,7 @@ cd project-sync
 
 下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml) 文件保存到`sync`目录
 
-根据说明修改其中的配置
+根据注释修改其中的配置
 
 ### 4.3 初始化
 
@@ -116,8 +116,8 @@ trident init
 将根据`sync.yaml`中`sync`配置的多个任务进行同步更新，并提交PR，当你有空时即可处理PR
 
 ```shell
-# 以后你只需要每周定时运行这个命令，即可保持同步升级
-trident start 
+# 以后你只需要定时运行这个命令，即可保持同步升级
+trident sync 
 ```
 
 ### 4.5 [可选] 保存 project-sync
@@ -133,7 +133,7 @@ trident remote <project-sync_git_url>
 
 ### 4.5 [可选] 定时运行
 
-你可以将 `<project-sync_git_url>` 这个远程仓库和 `trident start` 命令配置到任何`CI/DI`工具（例如jenkins、github
+你可以将 `<project-sync_git_url>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
 ## 5. 其他问题：
