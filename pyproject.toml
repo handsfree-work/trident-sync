@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trident-sync"
-version = "1.0.0"
+version = "1.0.1"
 description = "三叉戟，异构项目同步升级工具，The heterogeneous repo sync and upgrade CLI"
 authors = ["xiaojunnuo <xiaojunnuo@qq.com>"]
 license = "MIT"
