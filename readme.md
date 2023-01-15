@@ -126,12 +126,13 @@ trident sync
 
 将`project-sync`提交到你的远程服务器，防止更换电脑丢失同步进度
 
-后续你可以在任意位置`clone`出`project-sync`之后，运行`trident sync`即可继续同步
 
 ```shell
-# 执行初始化操作
+# 给同步仓库设置远程地址，并push
 trident remote --url=<project-sync_git_url> 
 ```
+
+后续你可以在任意位置`clone`出`project-sync`之后，运行`trident sync`即可继续同步
 
 > 注意：这个 `<project-sync_git_url>` 是一个全新的git仓库，用来保存同步进度的
 

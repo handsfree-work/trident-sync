@@ -166,7 +166,8 @@ def handle_sync(root, config, args):
     if not sms:
         logger.info("还未初始化，请先执行初始化命令")
         return
-
+    # 初始化一下子项目，以防万一
+    shell(f"git submodule update --init --recursive --progress")
     conf_repo = config['repo']
     conf_options = config['options']
     conf_repo_root = conf_options['repo_root']
@@ -215,7 +216,7 @@ def do_task(args, root, conf_options, conf_repo, conf_sync, key, sms, status, ht
 
     def pull_src_repo():
         logger.info(f"更新源仓库:{conf_src_repo['url']}")
-        shell(f"cd {repo_src.working_dir} && git pull")
+        shell(f"cd {repo_src.working_dir} && git checkout {conf_src_repo['branch']} && git pull")
         logger.info(f"更新源仓库成功")
 
     def back_to_main_branch():
@@ -223,11 +224,30 @@ def do_task(args, root, conf_options, conf_repo, conf_sync, key, sms, status, ht
         shell(f"git checkout -f {conf_target_repo['branch']}")
         time.sleep(1)
 
-    def create_and_checkout(cur_rep, branch):
+    def checkout_sync_branch(cur_rep, branch):
+        # 看看远程是否有对应分支
         logger.info(f"checkout同步分支：{branch}")
-        if branch not in cur_rep.heads:
+
+        origin_key = f"origin/{branch}"
+        origin_exists = False
+        local_exists = False
+        if origin_key in repo_target.refs:
+            origin_exists = True
+
+        if branch in cur_rep.heads:
+            local_exists = True
+
+        if origin_exists and not local_exists:
+            # 远程有，本地没有，从远程拉取
+            shell(f"git branch {branch} --track origin/{branch}")
+        elif not origin_exists and not local_exists:
+            # 两边都没有，本地创建
             shell(f"git branch {branch}")
-            time.sleep(1)
+        elif origin_exists and local_exists:
+            # 两边都有
+            shell(f"git checkout {branch}")
+            shell(f"git pull")
+        time.sleep(1)
         shell(f"git checkout {branch}")
         time.sleep(1)
 
@@ -311,8 +331,8 @@ def do_task(args, root, conf_options, conf_repo, conf_sync, key, sms, status, ht
     def do_pull_request(has_push):
         if not get_dict_value(conf_options, 'pr'):
             return False
-        # if not has_push:
-        #     return False
+        if not has_push:
+            return False
         token = get_dict_value(conf_target_repo, 'token')
         repo_type = get_dict_value(conf_target_repo, 'type')
         arg_token = get_arg(args, '--token')
@@ -343,7 +363,7 @@ def do_task(args, root, conf_options, conf_repo, conf_sync, key, sms, status, ht
     # 先强制切换回主分支
     back_to_main_branch()
     # 创建同步分支，并checkout
-    create_and_checkout(repo_target, conf_target['branch'])
+    checkout_sync_branch(repo_target, conf_target['branch'])
     # 开始复制文件
     do_sync()
     # 提交代码
