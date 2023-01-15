@@ -6,16 +6,17 @@
 Usage:
     trident init [-r ROOT] [-c CONFIG]
     trident sync [-r ROOT] [-c CONFIG] [-t token]
-    trident remote [-r ROOT] <url>
+    trident remote <url> [-r ROOT]
+    trident -h
 Options:
-    -h,--help  显示帮助菜单
+    -h,--help           显示帮助菜单
     -c,--config=CONFIG  配置文件  [default: sync.yaml]
-    -r,--root=ROOT  根目录  [default: .]
-    -t,--token=TOKEN   PR token
+    -r,--root=ROOT      根目录  [default: .]
+    -t,--token=TOKEN    PR token
 Example:
     trident init
     trident sync
-    trident remote https://github.com/greper/trident-test
+    trident remote https://github.com/handsfree-work/trident-test-sync
 """
 import datetime
 import logging
@@ -55,14 +56,19 @@ def cli():
                 ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
         ''')
     root = get_root(args)
+    if not os.path.exists(root):
+        os.mkdir(root)
+    os.chdir(root)
+    if args['remote']:
+        handle_remote(root, args)
+        return
+
     config = read_config(root, args)
 
     if args['init']:
         handle_init(root, config)
     elif args['sync']:
         handle_sync(root, config, args)
-    elif args['remote']:
-        handle_remote(root, config, args)
     else:
         logger.info(__doc__)
 
@@ -82,9 +88,6 @@ def handle_init(root, config):
     """
     处理 init 命令
     """
-    if not os.path.exists(root):
-        os.mkdir(root)
-    os.chdir(root)
     logger.info(f"即将在{root}目录初始化同步项目")
     logger.info(f"git init : {root}")
     shell('git init')
@@ -354,14 +357,22 @@ def do_task(args, root, conf_options, conf_repo, conf_sync, key, sms, status, ht
     logger.info(f"--------------------- 任务【{key}】完成 ---------------------∈")
 
 
-def handle_remote(root, config, args):
+def handle_remote(root, args):
+    repo = git.Repo(path=root)
+    cur_branch_name = repo.head.reference
     url = args['<url>']
-    if not url:
-        shell(f"git remote add origin {url}")
-        # origin = repo.create_remote("origin", url)
-        logger.info('关联远程地址成功:' + url)
+    if 'origin' not in repo.remotes and not url:
+        logger.info("请先通过 trident remote <sync_git_url> 命令设置远程地址")
+        return
+    if url:
+        if 'origin' in repo.remotes:
+            logger.info("origin已经存在，无需传url")
+        else:
+            shell(f"git remote add origin {url}")
+            # origin = repo.create_remote("origin", url)
+            logger.info('关联远程地址成功:' + url)
 
-    shell(f"git push")
+    shell(f"git push -u origin {cur_branch_name}")
     logger.info('push 成功')
 
 
