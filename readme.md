@@ -74,10 +74,10 @@ src
 为了使`certd-client`和`certd-server`能够随时同步`模版项目`的更新       
 我将使用`trident-sync`来自动帮我升级。
 
-<center>
+<p align="center">
 <img src="./doc/images/trident.png" height="400"/>
 <div>像不像个三叉戟？</div>
-</center>
+<p>
 
 ## 4. 快速开始
 
