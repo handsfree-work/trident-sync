@@ -97,7 +97,7 @@ cd project-sync
 
 ### 4.2 编写`sync.yaml`文件
 
-下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml) 文件保存到`sync`目录
+下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml) 文件保存到`project-sync`目录
 
 根据注释修改其中的配置
 
