@@ -1,6 +1,6 @@
 # trident-sync 三叉戟同步
 
-异构项目同步升级CLI工具
+三叉戟同步，是一款异构项目同步升级CLI工具
 
 [中文](./readme.md) / [English](./readme-en.md)
 
@@ -83,7 +83,7 @@ src
 
 ### 4.1 准备工作
 
-* 安装 [python](https://www.python.org/downloads/)
+* 安装 [python (3.8+)](https://www.python.org/downloads/)
 * 准备你的项目和要同步的模版项目仓库地址和分支
 
 ```shell

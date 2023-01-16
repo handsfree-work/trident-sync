@@ -11,7 +11,7 @@ repo: # 仓库列表
     url: "https://github.com/handsfree-work/trident-test"           # 仓库地址
     path: "target"                    # submodule子路径
     branch: "main"                    # 你的代码开发主分支（接受合并的分支）例如dev、main等
-    token: ""                         # 仓库token，用于提交PR, 前往 https://github.com/settings/tokens 创建token
+    token: ""                         # 仓库token，用于提交PR, 更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
     type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea/gitlab]
 #  repo4:                           # 你可以配置更多仓库
 #    url: "https://xxxxxxx"
