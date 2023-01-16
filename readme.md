@@ -76,7 +76,7 @@ src
 
 <p align="center">
 <img src="./doc/images/trident.png" height="400"/>
-<div>像不像个三叉戟？</div>
+<p align="center">像不像个三叉戟？</p>
 <p>
 
 ## 4. 快速开始
