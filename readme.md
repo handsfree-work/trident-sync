@@ -137,7 +137,7 @@ trident remote --url=<project-sync_git_url>
 
 ### 4.5 [可选] 定时运行
 
-你可以将 `<project-sync_git_url>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
+你可以将 `<project-sync>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
 ## 5. 其他问题：
