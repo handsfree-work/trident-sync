@@ -74,10 +74,10 @@ src
 为了使`certd-client`和`certd-server`能够随时同步`模版项目`的更新       
 我将使用`trident-sync`来自动帮我升级。
 
-<div style="text-align: center">
+<center>
 <img src="./doc/images/trident.png" height="400"/>
 <div>像不像个三叉戟？</div>
-</div>
+</center>
 
 ## 4. 快速开始
 
@@ -97,7 +97,8 @@ cd project-sync
 
 ### 4.2 编写`sync.yaml`文件
 
-下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml) 文件保存到`project-sync`目录
+下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml)
+文件保存到`project-sync`目录
 
 根据注释修改其中的配置
 
