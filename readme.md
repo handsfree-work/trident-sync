@@ -17,7 +17,6 @@
 * `你项目的多个目录` 同步到 `多个模版项目`
 * `你项目的多个目录` 同步到 `模版项目的多个目录`
 
-
 ## 2. 实现原理
 
 初始化：
@@ -46,11 +45,11 @@
 我通过`yarn`的`workspace`功能将多个子模块放在一个仓库中管理       
 它的目录结构如下：
 
-```js
+```
 src
 | --packages
-| --core           //实现申请证书的核心
-| --plugins        //一些任务插件，部署证书到远程服务器、云服务之上。
+    | --core           //实现申请证书的核心
+    | --plugins        //一些任务插件，部署证书到远程服务器、云服务之上。
 
 ```
 
@@ -62,14 +61,14 @@ src
 
 这时`certd`项目目录结构将变成如下：
 
-```js
+```
 src
 | --packages
-| --core
-| --plugins
-| --ui
-| --certd - client   //这是fs-admin-antdv的副本
-| --certd - server   //这是fs-server-js的副本
+    | --core
+    | --plugins
+    | --ui
+        | --certd - client   //这是fs-admin-antdv的副本
+        | --certd - server   //这是fs-server-js的副本
 ```
 
 为了使`certd-client`和`certd-server`能够随时同步`模版项目`的更新       
@@ -111,6 +110,7 @@ cd project-sync
 # 执行初始化操作
 trident init 
 ```
+
 > 注意：只需运行一次即可，除非你添加了新的`repo`
 
 ### 4.4 进行同步
@@ -125,7 +125,6 @@ trident sync
 ### 4.5 [可选] 保存 project-sync
 
 将`project-sync`提交到你的远程服务器，防止更换电脑丢失同步进度
-
 
 ```shell
 # 给同步仓库设置远程地址，并push
@@ -146,7 +145,8 @@ action、drone等）自动定时同步
 ### 5.1 为何不fork模版项目，通过submodule来管理
 
 这是我最初采用的方法，确实可以通过set-upstream,然后进行合并来进行同步升级。        
-但管理众多的submodule仍然是一件费力且很容易出错的事情，比如：     
+但管理众多的submodule仍然是一件费力且很容易出错的事情，比如：
+
 * 想要采用git-flow模式，就得频繁切换所有的submodule的分支
 * 想要管控main分支的提交权限，多个submodule相当繁琐
 * lerna不支持submodule模块的发布
