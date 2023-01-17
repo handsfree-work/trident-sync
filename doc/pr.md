@@ -53,17 +53,5 @@ https://your.gitea.host/user/settings/applications
 
 暂未实现
 
-# 冲突处理
-
-当PR有冲突时，需要手动处理冲突，才能合并进入主分支
-
-其中 `github` `gitee`支持在web页面直接解决冲突，不过一般建议在IDE上进行处理
-
-## 手动解决冲突
-
-1. 关闭PR
-2. 本地更新所有分支
-3. 通过IDE进行分支merge操作（rebase也行，用你平常熟悉的合并分支操作）
-
 
 

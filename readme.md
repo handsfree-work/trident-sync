@@ -112,16 +112,17 @@ cd project-sync
 trident init 
 ```
 
-> 注意：只需运行一次即可，除非你添加了新的`repo`
+> 只需运行一次即可，除非你添加了新的`repo`
 
 ### 4.4 进行同步
 
-将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，当你有空时处理PR即可
-
+将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，等你有空时处理有冲突的PR即可
 ```shell
 # 以后你只需要定时运行这个命令，即可保持同步升级
 trident sync 
 ```
+
+
 
 ### 4.5 [可选] 保存 project-sync
 
@@ -132,7 +133,7 @@ trident sync
 trident remote --url=<project-sync_git_url> 
 ```
 
-后续你可以在任意位置`clone`出`project-sync`之后，运行`trident sync`即可继续同步
+后续你可以在任意位置`clone`出`project-sync`，运行`trident sync`即可继续同步
 
 > 注意：这个 `<project-sync_git_url>` 是一个全新的git仓库，用来保存同步进度的
 
@@ -141,7 +142,22 @@ trident remote --url=<project-sync_git_url>
 你可以将 `<project-sync>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
-## 5. 其他问题：
+## 5. 处理PR
+
+如果配置了`auto_merge:true`，那么PR无冲突时将会自动合并。
+当PR有冲突时，需要手动处理冲突，才能合并进入主分支
+
+其中 `github` `gitee`支持在web页面直接解决冲突。
+
+建议在IDE上进行冲突处理
+
+### 手动解决冲突
+
+1. 关闭PR
+2. 本地更新所有分支
+3. 通过IDE进行分支merge操作（rebase也行，用你平常熟悉的合并分支操作）
+
+## 6. 其他问题：
 
 ### 5.1 为何不fork模版项目，通过submodule来管理
 
