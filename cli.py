@@ -47,7 +47,7 @@ def cli():
                 ψ     ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     ψ 
                 ψ      https://github.com/handsfree-work/trident-sync       ψ
                 ψ              Don't be stingy with your star               ψ
-                ψ                    请不要吝啬你的star哟                      ψ
+                ψ                    请不要吝啬你的star                        ψ
                 ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
         ''')
     root = get_root(args)

@@ -1,0 +1,29 @@
+repo: # 仓库列表
+  sync-src: # 上游项目1，可以任意命名
+    url: "https://github.com/handsfree-test/sync-src"      # 仓库地址
+    path: "sync-src"            # submodule保存路径
+    branch: "main"                    # 要同步过来的分支
+  target: # 你的项目（接受同步项目），可以任意命名
+    url: "https://github.com/handsfree-test/sync-target"           # 仓库地址
+    path: "target"                    # submodule子路径
+    branch: "main"                    # 你的代码开发主分支（接受合并的分支）例如dev、main等
+    token: ""                         # 仓库token，用于提交PR, 前往 https://github.com/settings/tokens 创建token
+    type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea/gitlab]
+
+
+sync: # 同步配置，可以配置多个同步任务
+  task: # 同步任务1，可以任意命名
+    src: # 源仓库
+      repo: sync-src                  # 源仓库名称，上面repo配置的仓库名称引用
+      dir: '.'                        #要同步给target的目录
+    target: #目标仓库
+      repo: sync-target                      # 目标仓库名称，上面repo配置的仓库名称引用
+      dir: 'package/sync-src'  # 接收src同步过来的目录
+      branch: 'test_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
+
+options: #选项
+  repo_root: repo         # submodule保存根目录
+  push: true              # 同步后是否push
+  pr: true                # 是否创建pr，需要目标仓库配置token和type
+  proxy_fix: true         # 是否将https代理改成http://开头
+  use_system_proxy: false  # 是否使用系统代理
