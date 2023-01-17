@@ -1,7 +1,8 @@
 .idea
 dist
 venv
-test
 sync
 poetry.lock
 __pycache__
+test/.pytest_cache
+test/pr_test_git

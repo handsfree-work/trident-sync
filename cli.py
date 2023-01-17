@@ -19,23 +19,16 @@ Example:
     trident sync
     trident remote --url=https://github.com/handsfree-work/trident-test-sync
 """
-import datetime
-import logging
-import shutil
-import stat
-import time
 
-from docopt import docopt
-import json
 import os
-import yaml
 
-from lib.api.index import api_clients
+import yaml
+from docopt import docopt
+
 from lib.handler.init import InitHandler
+from lib.handler.remote import RemoteHandler
 from lib.handler.sync import SyncHandler
-from lib.http import Http
 from lib.logger import logger
-from lib.util import get_dict_value, set_dict_value, shell, get_git_modify_file_count, save_file
 
 
 def cli():
@@ -61,7 +54,7 @@ def cli():
         os.mkdir(root)
     os.chdir(root)
     if args['remote']:
-        handle_remote(root, args)
+        RemoteHandler(root, args).handle()
         return
 
     config = read_config(root, args)
@@ -72,25 +65,6 @@ def cli():
         SyncHandler(root, config, args).handle()
     else:
         logger.info(__doc__)
-
-
-def handle_remote(root, args):
-    repo = git.RepoRef(path=root)
-    cur_branch_name = repo.head.reference
-    url = args['--url']
-    if 'origin' not in repo.remotes and not url:
-        logger.info("请先通过 trident remote --url=<sync_git_url> 命令设置远程地址")
-        return
-    if url:
-        if 'origin' in repo.remotes:
-            logger.info("origin已经存在，无需传url")
-        else:
-            shell(f"git remote add origin {url}")
-            # origin = repo.create_remote("origin", url)
-            logger.info('关联远程地址成功:' + url)
-
-    shell(f"git push -u origin {cur_branch_name}")
-    logger.info('push 成功')
 
 
 def read_config(root, args):

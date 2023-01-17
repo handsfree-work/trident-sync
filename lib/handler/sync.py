@@ -2,24 +2,18 @@ import datetime
 import json
 import os
 import shutil
-import stat
 import time
+
+import git
 
 from cli import get_arg
 from lib.api.index import api_clients
-from lib.util_git import force_checkout_main_branch, checkout_branch, collection_commit_message
 from lib.http import Http
 from lib.logger import logger
 from lib.model.opts import Options
-from lib.model.repo import RepoRef
-from lib.model.sync import SyncTask, SyncTaskSrc, SyncTaskTarget
-from lib.util import shell, save_file, get_dict_value, get_git_modify_file_count, check_need_push, set_dict_value
-import git
-
-
-def readonly_handler(func, path, execinfo):
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
+from lib.model.sync import SyncTask
+from lib.util import shell, get_dict_value, get_git_modify_file_count, check_need_push, set_dict_value
+from lib.util_git import force_checkout_main_branch, checkout_branch, collection_commit_message
 
 
 def read_status(root):
@@ -72,7 +66,6 @@ class SyncHandler:
         """
         处理 sync 命令
         """
-        root = self.root
         config = self.config
         logger.info(f"--------------------- 开始同步 ---------------------∈")
 
@@ -240,13 +233,14 @@ class TaskExecutor:
 
     def do_pull_request(self, has_push):
         key = self.key
-        if self.conf_options.pr:
+        if self.conf_options.pull_request:
             return False
         if not has_push:
             return False
         token = self.conf_target.repo_ref.token
         repo_type = self.conf_target.repo_ref.type
         arg_token = self.parent.token_from_args
+        auto_merge = self.parent.conf_options.auto_merge
         if not token and arg_token:
             token = arg_token
         if not repo_type or not token:
@@ -260,7 +254,8 @@ class TaskExecutor:
             logger.info(
                 f"准备提交pr, {self.conf_target.branch} -> {self.conf_target_repo.branch} , url:{self.conf_target_repo.url}")
             try:
-                client.create_pull_request(title, body, self.conf_target.branch, self.conf_target_repo.branch)
+                client.create_pull_request(title, body, self.conf_target.branch, self.conf_target_repo.branch,
+                                           auto_merge=auto_merge)
             except Exception as e:
                 # logger.opt(exception=e).error("提交PR出错")
                 logger.error(f"提交PR出错：{e}")

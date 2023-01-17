@@ -12,16 +12,6 @@ class InitHandler:
         self.root = root
         self.config = config
 
-    def save_ignore_file(self, root):
-        ignore_file = f"{root}/.gitignore"
-        ignore = '''
-.idea
-.vscode
-.git
-__pycache__
-    '''
-        save_file(ignore_file, ignore)
-
     def handle(self):
         """
         处理 init 命令
@@ -34,7 +24,7 @@ __pycache__
         repo = git.Repo(path=root)
         print(repo.heads)
         if len(repo.heads) == 0:
-            self.save_ignore_file(root)
+            self.save_ignore_file()
             shell("git add .")
             time.sleep(1)
             shell('git commit -m "sync init start"')
@@ -70,3 +60,13 @@ __pycache__
 
         os.chdir(os.getcwd())
         logger.info("初始化完成")
+
+    def save_ignore_file(self):
+        ignore_file = f"{self.root}/.gitignore"
+        ignore = '''
+.idea
+.vscode
+.git
+__pycache__
+        '''
+        save_file(ignore_file, ignore)

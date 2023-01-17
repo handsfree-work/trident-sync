@@ -23,7 +23,7 @@ sync: # 同步配置，可以配置多个同步任务
   client: # 同步任务1，可以任意命名
     src: # 源仓库
       repo: fs-admin                  # 源仓库名称，上面repo配置的仓库名称引用
-      dir: '.'                        #要同步给target的目录
+      dir: '.'                        # 要同步给target的目录
     target: #目标仓库
       repo: test                      # 目标仓库名称，上面repo配置的仓库名称引用
       dir: 'package/ui/certd-client'  # 接收src同步过来的目录
@@ -36,7 +36,7 @@ sync: # 同步配置，可以配置多个同步任务
       repo: test
       dir: 'package/ui/certd-server'
       branch: 'server_sync'
-#  task3:                          #你可以配置更多同步任务
+#  task3:                          # 你可以配置更多同步任务
 #    src:
 #      repo: src_repo_name
 #      dir: ./dir
@@ -46,8 +46,9 @@ sync: # 同步配置，可以配置多个同步任务
 #      branch: sync_branch_name        # 需要配置一个未被占用的分支名称
 
 options: #选项
-  repo_root: repo         # submodule保存根目录
-  push: true              # 同步后是否push
-  pr: true                # 是否创建pr，需要目标仓库配置token和type
-  proxy_fix: true         # 是否将https代理改成http://开头
+  repo_root: repo          # submodule保存根目录
+  push: true               # 同步后是否push
+  pull_request: true       # 是否创建pull request，需要目标仓库配置token和type
+  auto_merge: true         # 是否自动合并,如果有冲突则需要手动处理
+  proxy_fix: true          # 是否将https代理改成http://开头
   use_system_proxy: false  # 是否使用系统代理

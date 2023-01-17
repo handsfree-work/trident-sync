@@ -1,12 +1,19 @@
-import time
-
 from lib.api.abstract_client import AbstractClient
-from lib.http import Http, HTTPException
-from lib.logger import logger
-from lib.util import get_dict_value
 
 
 class GithubClient(AbstractClient):
+    '''
+            https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28
+
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer <YOUR-TOKEN>"\
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              https://api.github.com/repos/OWNER/REPO/pulls \
+              -d '{"title":"Amazing new feature","body":"Please pull these awesome changes in!","head":"octocat:new-feature","base":"master"}'
+            '''
+
     '''github api'''
     # 下面定义了一个类属性
     token = 'token'
@@ -49,6 +56,6 @@ class GithubClient(AbstractClient):
         res = self.http.get(api, headers=self.headers, res_is_standard=False, res_is_json=True)
         return res
 
-    def put_merge(self, pull_id):
+    def post_merge(self, pull_id, detail):
         api = f"https://api.github.com/repos/{self.repo_path}/pulls/{pull_id}/merge"
         self.http.put(api, data={}, headers=self.headers, res_is_standard=False, res_is_json=True)

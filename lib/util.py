@@ -1,16 +1,20 @@
 import os
+import shutil
+import stat
 import subprocess as sp
 import re
 from lib.logger import logger
 
 
-def re_pick(re_str, input_str, flags=None):
+def re_pick(re_str, input_str, flags=0):
     # inputStr = "['{0: 203, 11: 1627438682 [2021-07-28 10:18:02],  12:36 [通过蓝牙更改错误密码锁定计数], 13: 770449129, 19: 3, 20: 0, 100: 2141634486}']"
 
     reg = re.compile(re_str, flags)  # 增加匹配效率的 S 多行匹配
     lists = re.findall(reg, str(input_str))
     print('lists={}'.format(lists))
-    return lists
+    if len(lists) > 0:
+        return lists[0]
+    return []
 
 
 def get_dict_value(dict_target, key, def_value=None):
@@ -114,3 +118,11 @@ def merge_from_dict(obj, dic):
     for key in dic:
         if key in obj:
             obj[key] = dic[key]
+
+
+def rm_dir(root):
+    def readonly_handler(func, path, exe_info):
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+
+    shutil.rmtree(root, onerror=readonly_handler)

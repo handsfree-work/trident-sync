@@ -6,7 +6,7 @@ import urllib
 from lib.logger import logger
 
 
-class HTTPException(Exception):
+class HttpException(Exception):
     # 自定义异常类型的初始化
     def __init__(self, msg, code, data):
         self.msg = msg
@@ -120,7 +120,7 @@ class Http:
 
     def res_handle(self, response, res_is_json, res_is_standard):
 
-        if response.status_code != 200 and response.status_code != 201:
+        if response.status_code < 200 or response.status_code > 299:
             return self.error_handle(response)
 
         if res_is_json:
@@ -137,4 +137,4 @@ class Http:
             data = json.loads(response.text)
         except Exception as e:
             pass
-        raise HTTPException(f'请求错误：({response.status_code}):{response.text}', 1, data)
+        raise HttpException(f'请求错误：({response.status_code}):{response.text}', 1, data)
