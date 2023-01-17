@@ -1,6 +1,6 @@
 # trident-sync 三叉戟同步
 
-异构项目同步升级CLI工具
+三叉戟同步，是一款异构项目同步升级CLI工具
 
 [中文](./readme.md) / [English](./readme-en.md)
 
@@ -16,7 +16,6 @@
 * `模版项目的多个目录` 同步到 `你项目的多个目录`
 * `你项目的多个目录` 同步到 `多个模版项目`
 * `你项目的多个目录` 同步到 `模版项目的多个目录`
-
 
 ## 2. 实现原理
 
@@ -46,11 +45,11 @@
 我通过`yarn`的`workspace`功能将多个子模块放在一个仓库中管理       
 它的目录结构如下：
 
-```js
+```
 src
 | --packages
-| --core           //实现申请证书的核心
-| --plugins        //一些任务插件，部署证书到远程服务器、云服务之上。
+    | --core           //实现申请证书的核心
+    | --plugins        //一些任务插件，部署证书到远程服务器、云服务之上。
 
 ```
 
@@ -62,29 +61,29 @@ src
 
 这时`certd`项目目录结构将变成如下：
 
-```js
+```
 src
 | --packages
-| --core
-| --plugins
-| --ui
-| --certd - client   //这是fs-admin-antdv的副本
-| --certd - server   //这是fs-server-js的副本
+    | --core
+    | --plugins
+    | --ui
+        | --certd - client   //这是fs-admin-antdv的副本
+        | --certd - server   //这是fs-server-js的副本
 ```
 
 为了使`certd-client`和`certd-server`能够随时同步`模版项目`的更新       
 我将使用`trident-sync`来自动帮我升级。
 
-<div style="text-align: center">
+<p align="center">
 <img src="./doc/images/trident.png" height="400"/>
-<div>像不像个三叉戟？</div>
-</div>
+<p align="center">像不像个三叉戟？</p>
+<p>
 
 ## 4. 快速开始
 
 ### 4.1 准备工作
 
-* 安装 [python](https://www.python.org/downloads/)
+* 安装 [python (3.8+)](https://www.python.org/downloads/)
 * 准备你的项目和要同步的模版项目仓库地址和分支
 
 ```shell
@@ -98,7 +97,8 @@ cd project-sync
 
 ### 4.2 编写`sync.yaml`文件
 
-下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml) 文件保存到`sync`目录
+下载 [sync.yaml模版](https://raw.githubusercontent.com/handsfree-work/trident-sync/main/sync.yaml)
+文件保存到`project-sync`目录
 
 根据注释修改其中的配置
 
@@ -111,42 +111,59 @@ cd project-sync
 # 执行初始化操作
 trident init 
 ```
-> 注意：只需运行一次即可，除非你添加了新的`repo`
+
+> 只需运行一次即可，除非你添加了新的`repo`
 
 ### 4.4 进行同步
 
-将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，当你有空时处理PR即可
-
+将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，等你有空时处理有冲突的PR即可
 ```shell
 # 以后你只需要定时运行这个命令，即可保持同步升级
 trident sync 
 ```
 
+
+
 ### 4.5 [可选] 保存 project-sync
 
 将`project-sync`提交到你的远程服务器，防止更换电脑丢失同步进度
-
 
 ```shell
 # 给同步仓库设置远程地址，并push
 trident remote --url=<project-sync_git_url> 
 ```
 
-后续你可以在任意位置`clone`出`project-sync`之后，运行`trident sync`即可继续同步
+后续你可以在任意位置`clone`出`project-sync`，运行`trident sync`即可继续同步
 
 > 注意：这个 `<project-sync_git_url>` 是一个全新的git仓库，用来保存同步进度的
 
 ### 4.5 [可选] 定时运行
 
-你可以将 `<project-sync_git_url>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
+你可以将 `<project-sync>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
-## 5. 其他问题：
+## 5. 处理PR
+
+如果配置了`auto_merge:true`，那么PR无冲突时将会自动合并。
+当PR有冲突时，需要手动处理冲突，才能合并进入主分支
+
+其中 `github` `gitee`支持在web页面直接解决冲突。
+
+建议在IDE上进行冲突处理
+
+### 手动解决冲突
+
+1. 关闭PR
+2. 本地更新所有分支
+3. 通过IDE进行分支merge操作（rebase也行，用你平常熟悉的合并分支操作）
+
+## 6. 其他问题：
 
 ### 5.1 为何不fork模版项目，通过submodule来管理
 
 这是我最初采用的方法，确实可以通过set-upstream,然后进行合并来进行同步升级。        
-但管理众多的submodule仍然是一件费力且很容易出错的事情，比如：     
+但管理众多的submodule仍然是一件费力且很容易出错的事情，比如：
+
 * 想要采用git-flow模式，就得频繁切换所有的submodule的分支
 * 想要管控main分支的提交权限，多个submodule相当繁琐
 * lerna不支持submodule模块的发布
