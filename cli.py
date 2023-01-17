@@ -29,6 +29,7 @@ from lib.handler.init import InitHandler
 from lib.handler.remote import RemoteHandler
 from lib.handler.sync import SyncHandler
 from lib.logger import logger
+from lib.util import get_arg
 
 
 def cli():
@@ -62,7 +63,8 @@ def cli():
     if args['init']:
         InitHandler(root, config).handle()
     elif args['sync']:
-        SyncHandler(root, config, args).handle()
+        token = get_arg(args, '--token')
+        SyncHandler(root, config, token).handle()
     else:
         logger.info(__doc__)
 
@@ -77,13 +79,6 @@ def read_config(root, args):
 def get_root(args):
     root = get_arg(args, '--root')
     return f"{os.getcwd()}/{root}"
-
-
-def get_arg(args, key):
-    value = args[key]
-    if isinstance(value, list):
-        value = value[0]
-    return value
 
 
 if __name__ == '__main__':

@@ -1,10 +1,33 @@
 import time
 
-from util_git import Repo
+from git import Repo
 
 from lib.logger import logger
 from lib.model.repo import RepoRef
 from lib.util import shell
+
+
+def add_and_commit(message):
+    shell("git add .")
+    count = get_git_modify_file_count()
+    if count > 0:
+        time.sleep(1)
+        shell(f'git commit -m "{message}"')
+def get_git_modify_file_count():
+    ret = shell(f"git status", get_out=True)
+    lines = ret.split("\n")
+    file_list = []
+    # 忽略的package列表
+
+    count = 0
+    for line in lines:
+        start = line.find(':   ')
+        if (start < 0):
+            continue
+        start += 1
+        file = line[start:].strip()
+        count += 1
+    return count
 
 
 def force_checkout_main_branch(conf_repo_ref: RepoRef):
@@ -13,7 +36,7 @@ def force_checkout_main_branch(conf_repo_ref: RepoRef):
     time.sleep(1)
 
 
-def checkout_branch(repo: Repo.Base, branch: str):
+def checkout_branch(repo: Repo, branch: str):
     '''
     创建或更新分支，如果远程有，则从远程拉取
     '''

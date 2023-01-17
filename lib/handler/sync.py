@@ -6,14 +6,14 @@ import time
 
 import git
 
-from cli import get_arg
 from lib.api.index import api_clients
 from lib.http import Http
 from lib.logger import logger
 from lib.model.opts import Options
 from lib.model.sync import SyncTask
-from lib.util import shell, get_dict_value, get_git_modify_file_count, check_need_push, set_dict_value
-from lib.util_git import force_checkout_main_branch, checkout_branch, collection_commit_message
+from lib.util import shell, get_dict_value, check_need_push, set_dict_value
+from lib.util_git import force_checkout_main_branch, checkout_branch, collection_commit_message, \
+    get_git_modify_file_count
 
 
 def read_status(root):
@@ -45,22 +45,20 @@ def save_status(root, status):
 
 class SyncHandler:
 
-    def __init__(self, root, config, args):
+    def __init__(self, root, config, token_from_args):
         self.root = root
         self.config = config
-        self.args = args
         self.status = read_status(root)
         self.conf_repo = config['repo']
         self.conf_options = Options(config['options'])
         self.conf_repo_root = self.conf_options.repo_root
 
-        proxy_fix = get_dict_value(self.conf_options, 'proxy_fix')
-        use_system_proxy = get_dict_value(self.conf_options, 'use_system_proxy')
+        proxy_fix = self.conf_options.proxy_fix
+        use_system_proxy = self.conf_options.use_system_proxy
         self.http = Http(use_system_proxy=use_system_proxy, proxy_fix=proxy_fix)
 
         self.repo = git.Repo.init(path=root)
-
-        self.token_from_args = get_arg(args, '--token')
+        self.token_from_args = token_from_args
 
     def handle(self):
         """
@@ -103,7 +101,7 @@ class SyncHandler:
         else:
             now = datetime.datetime.now()
             time.sleep(1)
-            shell(f'git commit -m "sync on {now}"')
+            shell(f'git commit -m "ψ: sync on {now}"')
             # shell(f"git push")
             if self.conf_options.push:
                 need_push = check_need_push(repo, repo.head)
@@ -198,7 +196,7 @@ class TaskExecutor:
             for msg in messsges:
                 body += msg + "\n"
             now = datetime.datetime.now()
-            message = f"sync: [{key}] sync upgrade [by trident-sync] [{now}]"
+            message = f"ψ: [{key}] sync upgrade [by trident-sync] [{now}]"
             # 提交更新
             shell(f'git commit -m "{message}" -m "{body}"')
             # repo_target.index.commit(f"sync {key} success [{now}]")

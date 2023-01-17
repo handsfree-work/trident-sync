@@ -5,6 +5,8 @@ from lib.logger import logger
 from lib.util import shell, save_file
 import git
 
+from lib.util_git import add_and_commit
+
 
 class InitHandler:
 
@@ -27,7 +29,7 @@ class InitHandler:
             self.save_ignore_file()
             shell("git add .")
             time.sleep(1)
-            shell('git commit -m "sync init start"')
+            shell('git commit -m "ψ: sync init start"')
         logger.info("get submodules")
         sms = repo.iter_submodules()
         print(sms)
@@ -53,11 +55,7 @@ class InitHandler:
 
         shell(f"git submodule update --init --recursive --progress")
         repo.iter_submodules()
-        repo.submodule_update(recursive=True)
-        shell("git add .")
-        time.sleep(1)
-        shell('git commit -m "sync init success"')
-
+        add_and_commit('ψ: sync init')
         os.chdir(os.getcwd())
         logger.info("初始化完成")
 

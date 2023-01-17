@@ -74,30 +74,13 @@ def save_file(file_path, content):
     fo.close()
 
 
-def get_git_modify_file_count():
-    ret = shell(f"git status", get_out=True)
-    lines = ret.split("\n")
-    file_list = []
-    # 忽略的package列表
-
-    count = 0
-    for line in lines:
-        start = line.find(':   ')
-        if (start < 0):
-            continue
-        start += 1
-        file = line[start:].strip()
-        count += 1
-    return count
-
-
 def check_need_push(repo, branch):
-    '''
+    """
     检查是否需要push，hash相等返回false，hash不相等返回true，没有远程分支返回None
     :param repo:
     :param branch:
     :return:
-    '''
+    """
     local_hash = repo.head.commit.hexsha
     remote_hash = None
     refs = repo.refs
@@ -116,8 +99,7 @@ def check_need_push(repo, branch):
 
 def merge_from_dict(obj, dic):
     for key in dic:
-        if key in obj:
-            obj[key] = dic[key]
+        setattr(obj, key, dic[key])
 
 
 def rm_dir(root):
@@ -126,3 +108,10 @@ def rm_dir(root):
         func(path)
 
     shutil.rmtree(root, onerror=readonly_handler)
+
+
+def get_arg(args, key):
+    value = args[key]
+    if isinstance(value, list):
+        value = value[0]
+    return value
