@@ -29,6 +29,7 @@ from lib.handler.init import InitHandler
 from lib.handler.remote import RemoteHandler
 from lib.handler.sync import SyncHandler
 from lib.logger import logger
+from lib.model.config import Config
 from lib.util import get_arg
 
 
@@ -55,22 +56,26 @@ def cli():
         os.mkdir(root)
     os.chdir(root)
     if args['remote']:
-        RemoteHandler(root, args).handle()
+        remote_url = args['--url']
+        RemoteHandler(root, remote_url=remote_url).handle()
         return
 
-    config = read_config(root, args)
+    arg_config = get_arg(args, '--config')
+    config_dict = read_config(root, arg_config)
+
+    token_from_args = get_arg(args, '--token')
+    config = Config(config_dict)
+    config.set_default_token(token_from_args)
 
     if args['init']:
         InitHandler(root, config).handle()
     elif args['sync']:
-        token = get_arg(args, '--token')
-        SyncHandler(root, config, token).handle()
+        SyncHandler(root, config).handle()
     else:
         logger.info(__doc__)
 
 
-def read_config(root, args):
-    arg_config = get_arg(args, '--config')
+def read_config(root, arg_config):
     config_file = f"{root}/{arg_config}"
     f = open(config_file, 'r', encoding='utf-8')
     return yaml.load(f, Loader=yaml.FullLoader)

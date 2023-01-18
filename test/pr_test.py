@@ -1,13 +1,12 @@
 import os.path
 
 import git
-import pytest
 
 from lib.api.abstract_client import pick_from_url
 from lib.api.gitea import GiteaClient
 from lib.api.gitee import GiteeClient
 from lib.api.github import GithubClient
-from lib.http import Http, HttpException
+from lib.http import Http
 from lib.logger import logger
 from lib.util import shell, save_file, rm_dir
 
@@ -16,10 +15,10 @@ no_conflict_branch = 'no_conflict_branch'
 conflict_branch = 'conflict_branch'
 
 
-def pr_test_prepare(origin_url):
+def prepare(origin_url):
     '''pr测试准备'''
     # 初始化git
-    pr_test_git_dir = os.path.abspath("./pr_test_git")
+    pr_test_git_dir = os.path.abspath("./tmp/pr_test_git")
     if os.path.exists(pr_test_git_dir):
         rm_dir(pr_test_git_dir)
     os.makedirs(pr_test_git_dir)
@@ -111,7 +110,7 @@ def test_pr_pick_git_url():
 
 def test_pr_github():
     origin_url = "https://github.com/handsfree-test/pr-test"
-    pr_test_prepare(origin_url)
+    prepare(origin_url)
     client = create_github_client(origin_url)
     title = "no_conflict branch pr"
     body = "no_conflict branch pr"
@@ -130,7 +129,7 @@ def test_pr_github():
 
 def test_pr_gitee():
     origin_url = "https://gitee.com/handsfree-test/pr-test"
-    pr_test_prepare(origin_url)
+    prepare(origin_url)
     client = create_gitee_client(origin_url)
     title = "no_conflict branch pr"
     body = "no_conflict branch pr"
@@ -151,7 +150,7 @@ def test_pr_gitee():
 
 def test_pr_gitea():
     origin_url = "http://docmirror.cn:6789/handsfree-test/pr-test"
-    pr_test_prepare(origin_url)
+    prepare(origin_url)
     client = create_gitea_client(origin_url)
     title = "no_conflict branch pr"
     body = "no_conflict branch pr"

@@ -9,14 +9,14 @@ sync:
           dir: 'package/ui/certd-client'  # 接收src同步过来的目录
           branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
 '''
-from lib.model.repo import RepoRef
+from lib.model.repo import RepoConf
 from lib.util import merge_from_dict
 
 
 class SyncTaskSrc:
     repo: str
     dir: str
-    repo_ref: RepoRef
+    repo_ref: RepoConf
 
     def __init__(self, conf_dict):
         merge_from_dict(self, conf_dict)
@@ -28,7 +28,8 @@ class SyncTaskTarget:
     repo: str
     dir: str
     branch: str
-    repo_ref: RepoRef
+    allow_reset_to_root: bool = False
+    repo_ref: RepoConf
 
     def __init__(self, conf_dict):
         merge_from_dict(self, conf_dict)
@@ -41,7 +42,7 @@ class SyncTask:
     src: SyncTaskSrc
     target: SyncTaskTarget
 
-    def __init__(self, key, conf_sync: dict, repo_list):
+    def __init__(self, key, conf_sync: dict, repo_map):
         self.key = key
 
         if 'src' not in conf_sync:
@@ -52,11 +53,11 @@ class SyncTask:
         self.src = SyncTaskSrc(conf_sync['src'])
         self.target = SyncTaskTarget(conf_sync['target'])
 
-        self.set_repo_ref(self.src, repo_list)
-        self.set_repo_ref(self.target, repo_list)
+        self.set_repo_ref(self.src, repo_map)
+        self.set_repo_ref(self.target, repo_map)
 
     def set_repo_ref(self, task, repo_list):
         if task.repo in repo_list:
-            task.repo_ref = RepoRef(repo_list[self.src.repo])
+            task.repo_ref = repo_list[self.src.repo]
         else:
             raise Exception(f"任务[{self.key}]的{self.src.repo} 仓库配置不存在，请检查repo配置")

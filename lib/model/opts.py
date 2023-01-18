@@ -13,9 +13,10 @@ class Options:
     repo_root: str = 'repo'
     push: bool = True
     pull_request: bool = True
-    auto_merge: bool = True
     proxy_fix: bool = True
     use_system_proxy: bool = True
 
-    def __init__(self, conf_dict):
+    def __init__(self, conf_dict=None):
+        if conf_dict is None:
+            conf_dict = {}
         merge_from_dict(self, conf_dict)

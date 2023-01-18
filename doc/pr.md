@@ -1,8 +1,8 @@
-# 创建PR
+# 启用PR
 
 同步成功后，支持自动创建PR
 
-要开启此功能需要给对应的 target_repo 配置 `token` 和 `type`
+要开启此功能需要给对应的 `target_repo` 配置 `token` 和 `type`
 
 ```yaml
 repo:
@@ -10,8 +10,9 @@ repo:
     url: 'xxxx'
     path: 'xxxx'
     branch: 'xxxx'
-    type: 'github'  # 远程仓库类型。可选值：[github / gitee / gitea ]
+    type: 'github'   # 远程仓库类型。可选值：[github / gitee / gitea ]
     token: "xxxxxxx" # 授权token，请根据下方说明创建
+    auto_merge: true # PR没冲突时，是否自动合并
 ```
 
 # token创建

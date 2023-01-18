@@ -9,9 +9,9 @@ import git
 from lib.api.index import api_clients
 from lib.http import Http
 from lib.logger import logger
-from lib.model.opts import Options
+from lib.model.config import Config
 from lib.model.sync import SyncTask
-from lib.util import shell, get_dict_value, check_need_push, set_dict_value
+from lib.util import shell, get_dict_value, check_need_push, set_dict_value, is_blank_dir
 from lib.util_git import force_checkout_main_branch, checkout_branch, collection_commit_message, \
     get_git_modify_file_count
 
@@ -45,12 +45,12 @@ def save_status(root, status):
 
 class SyncHandler:
 
-    def __init__(self, root, config, token_from_args):
+    def __init__(self, root, config):
         self.root = root
-        self.config = config
+        self.config: Config = config
         self.status = read_status(root)
-        self.conf_repo = config['repo']
-        self.conf_options = Options(config['options'])
+        self.conf_repo = config.repo
+        self.conf_options = config.options
         self.conf_repo_root = self.conf_options.repo_root
 
         proxy_fix = self.conf_options.proxy_fix
@@ -58,15 +58,14 @@ class SyncHandler:
         self.http = Http(use_system_proxy=use_system_proxy, proxy_fix=proxy_fix)
 
         self.repo = git.Repo.init(path=root)
-        self.token_from_args = token_from_args
 
     def handle(self):
         """
         处理 sync 命令
         """
-        config = self.config
         logger.info(f"--------------------- 开始同步 ---------------------∈")
-
+        config = self.config
+        os.chdir(self.root)
         sms = self.repo.submodules
         if not sms:
             logger.info("还未初始化，请先执行初始化命令")
@@ -74,15 +73,12 @@ class SyncHandler:
         # 初始化一下子项目，以防万一
         shell(f"git submodule update --init --recursive --progress")
 
-        if 'sync' not in config:
-            raise Exception("sync必须配置")
-
-        conf_sync_map = config['sync']
+        conf_sync_map = config.sync
 
         for key in conf_sync_map:
-            conf_sync = SyncTask(key, conf_sync_map[key], self.conf_repo)
+            conf_sync: SyncTask = conf_sync_map[key]
             # 执行同步任务
-            task_executor = TaskExecutor(conf_sync, self, sms)
+            task_executor = TaskExecutor(self.root, self.config, self.status, sms, self.http, conf_sync)
             task_executor.do_task()
 
         # 所有任务已完成
@@ -90,6 +86,7 @@ class SyncHandler:
         self.commit_cur_repo()
 
         logger.info(f"--------------------- 同步结束 ---------------------∈")
+        self.repo.close()
 
     def commit_cur_repo(self):
         os.chdir(self.root)
@@ -101,7 +98,7 @@ class SyncHandler:
         else:
             now = datetime.datetime.now()
             time.sleep(1)
-            shell(f'git commit -m "ψ: sync on {now}"')
+            shell(f'git commit -m "🔱: sync all task at {now} [trident-sync]"')
             # shell(f"git push")
             if self.conf_options.push:
                 need_push = check_need_push(repo, repo.head)
@@ -113,19 +110,19 @@ class SyncHandler:
 
 
 class TaskExecutor:
-    def __init__(self, conf_sync: SyncTask, parent: SyncHandler, sms):
+    def __init__(self, root, config: Config, status: dict, sms, http, conf_sync: SyncTask):
         self.key = conf_sync.key
-        self.root = parent.root
-        self.parent = parent
+        self.root = root
         self.conf_sync = conf_sync
         self.sms = sms
-        self.conf_repo = parent.conf_repo
+        self.conf_repo = config.repo
         self.conf_src = conf_sync.src
         self.conf_target = conf_sync.target
 
-        self.conf_options = parent.conf_options
+        self.conf_options = config.options
 
-        self.status = parent.status
+        self.status = status
+        self.http = http
 
         self.conf_src_repo = self.conf_src.repo_ref
         self.conf_target_repo = self.conf_target.repo_ref
@@ -145,30 +142,62 @@ class TaskExecutor:
         # 先强制切换回主分支
         force_checkout_main_branch(self.conf_target.repo_ref)
         # 创建同步分支，并checkout
-        checkout_branch(self.repo_target, self.conf_target.branch)
+        is_first = checkout_branch(self.repo_target, self.conf_target.branch)
         # 开始复制文件
-        self.do_sync()
+        self.do_sync(is_first)
         # 提交代码
         self.do_commit()
         # push更新
         has_push = self.do_push()
         # 创建PR
         self.do_pull_request(has_push)
-        # TODO 通知用户？
         # 切换回主分支
         force_checkout_main_branch(self.conf_target.repo_ref)
 
         logger.info(f"--------------------- 任务【{self.key}】完成 ---------------------∈")
+        self.repo_src.close()
+        self.repo_target.close()
 
     def pull_src_repo(self):
         logger.info(f"更新源仓库:{self.conf_src.repo_ref.url}")
         shell(f"cd {self.repo_src.working_dir} && git checkout {self.conf_src.repo_ref.branch} && git pull")
-        logger.info(f"更新源仓库成功")
+        logger.info(f"更新源仓库的子仓库")
+        shell(f"cd {self.repo_src.working_dir} && git submodule update --init --recursive --progress ")
+        logger.info(f"更新源仓库完成")
 
-    def do_sync(self, ):
+    def do_sync(self, is_first):
         dir_src_sync = f"{self.repo_src.working_dir}/{self.conf_src.dir}"
         dir_target_sync = f"{self.repo_target.working_dir}/{self.conf_target.dir}"
         logger.info(f"同步目录：{dir_src_sync}->{dir_target_sync}")
+        # 检查源仓库目录是否有文件，如果没有文件，可能初始化仓库不正常
+        src_is_blank = is_blank_dir(dir_src_sync)
+        if src_is_blank:
+            raise Exception(
+                f"检测源仓库目录<{dir_src_sync}> 为空。可能初始化不完全，请立即检查，尝试进入该目录执行git pull命令")
+
+        if is_first:
+            # 第一次同步，目标目录必须为空
+            target_is_blank = is_blank_dir(dir_target_sync)
+            if not target_is_blank:
+                logger.warning(
+                    f"第一次同步，检测到目标仓库目录<{dir_src_sync}>不为空")
+                logger.warning(
+                    f"请确保该目录内是源仓库某一版本的文件副本，否则请换一个目录！！！")
+                logger.warning(
+                    f"如果你确定该目录是源仓库某一版本的文件副本，你可以尝试配置sync.[task].target.allow_reset_to_root:true，然后重新运行同步命令")
+                logger.warning(
+                    f"这将尝试重置同步分支到root commit，看早期的版本是否有该目录。")
+                if not self.conf_target.allow_reset_to_root:
+                    raise Exception(f"检测到目标仓库目录<{dir_src_sync}>不为空")
+                else:
+                    logger.info(f"正在尝试重置同步分支到root commit")
+                    root_hash = shell("git rev-list --max-parents=0 HEAD", get_out=True)
+                    shell(f"git reset {root_hash.strip()}")
+                    # 再次检测目录是否为空
+                    target_is_blank = is_blank_dir(dir_target_sync)
+                    if not target_is_blank:
+                        raise Exception(f"目标仓库目录<{dir_src_sync}>仍然不为空，请换一个目录")
+
         if os.path.exists(dir_target_sync):
             shutil.rmtree(dir_target_sync)
             time.sleep(0.2)
@@ -184,7 +213,7 @@ class TaskExecutor:
         time.sleep(1)
         count = get_git_modify_file_count()
         time.sleep(1)
-        print(f"modify count : {count}")
+        logger.info(f"modify count : {count}")
         key = self.key
         if count <= 0:
             logger.info(f"{key} 没有变化，无需提交")
@@ -196,7 +225,7 @@ class TaskExecutor:
             for msg in messsges:
                 body += msg + "\n"
             now = datetime.datetime.now()
-            message = f"ψ: [{key}] sync upgrade [by trident-sync] [{now}]"
+            message = f"🔱: [{key}] sync upgrade with {len(messsges)} commits [trident-sync] "
             # 提交更新
             shell(f'git commit -m "{message}" -m "{body}"')
             # repo_target.index.commit(f"sync {key} success [{now}]")
@@ -237,15 +266,12 @@ class TaskExecutor:
             return False
         token = self.conf_target.repo_ref.token
         repo_type = self.conf_target.repo_ref.type
-        arg_token = self.parent.token_from_args
-        auto_merge = self.parent.conf_options.auto_merge
-        if not token and arg_token:
-            token = arg_token
+        auto_merge = self.conf_target_repo.auto_merge
         if not repo_type or not token:
             logger.warning(f"{self.conf_target.repo} 未配置token 或 type，无法提交PR")
             return False
         else:
-            client = api_clients[repo_type](self.parent.http, token, self.conf_target.repo_ref.url)
+            client = api_clients[repo_type](self.http, token, self.conf_target.repo_ref.url)
             title = f"[{key}] sync upgrade 【by trident-sync】"
             body = f"{self.conf_src.repo}:{self.conf_src_repo.branch}:{self.conf_src.dir} -> {self.conf_target.repo}:\
                 {self.conf_target_repo.branch}:{self.conf_target.dir} "

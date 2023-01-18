@@ -10,14 +10,17 @@ repo:
 from lib.util import merge_from_dict
 
 
-class RepoRef:
+class RepoConf:
+    key: str
     url: str
     branch: str
     path: str
     token: str
     type: str
+    auto_merge: bool = True
 
-    def __init__(self, conf_dict):
+    def __init__(self, key, conf_dict: dict):
+        self.key = key
         merge_from_dict(self, conf_dict)
         if not self.url or not self.branch or not self.path:
             raise Exception("repo中 < url/branch/path > 必须配置")

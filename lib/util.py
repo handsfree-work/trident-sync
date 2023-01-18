@@ -11,7 +11,6 @@ def re_pick(re_str, input_str, flags=0):
 
     reg = re.compile(re_str, flags)  # 增加匹配效率的 S 多行匹配
     lists = re.findall(reg, str(input_str))
-    print('lists={}'.format(lists))
     if len(lists) > 0:
         return lists[0]
     return []
@@ -32,7 +31,7 @@ def get_dict_value(dict_target, key, def_value=None):
     return value
 
 
-def set_dict_value(dict_target: object, key: object, value: object) -> object:
+def set_dict_value(dict_target: object, key: str, value: object) -> object:
     arr = str.split(key, '.')
     parent = dict_target
     last_key = arr[len(arr) - 1]
@@ -53,6 +52,8 @@ def shell(cmd, ignore_errors=False, get_out=False):
 
     p = sp.run(cmd, shell=True, encoding='utf-8', stdout=out)
     if p.returncode != 0 and not ignore_errors:
+        print(p.stdout)
+        print(p.stderr)
         raise Exception(p.stderr)
     if get_out and p.stdout:
         print(p.stdout)
@@ -115,3 +116,18 @@ def get_arg(args, key):
     if isinstance(value, list):
         value = value[0]
     return value
+
+
+def is_blank_dir(root):
+    """
+    检查目录是否为空，如果目录不存在也返回True
+    """
+    if not os.path.exists(root):
+        return True
+    is_blank = True
+    for file in os.listdir(root):
+        if file == '.git':
+            continue
+        is_blank = False
+        break
+    return is_blank

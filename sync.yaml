@@ -1,39 +1,41 @@
 repo: # 仓库列表
   fs-admin: # 上游项目1，可以任意命名
-    url: "https://github.com/fast-crud/fs-admin-antdv"      # 仓库地址
+    url: "https://github.com/fast-crud/fs-admin-antdv" # 仓库地址
     path: "fs-admin-antdv"            # submodule保存路径
     branch: "main"                    # 要同步过来的分支
   fs-server: # 上游项目2，可以任意命名
-    url: "https://github.com/fast-crud/fs-server-js"        # 仓库地址
+    url: "https://github.com/fast-crud/fs-server-js" # 仓库地址
     path: "fs-server-js"              # submodule保存路径
     branch: "main"                    # 要同步过来的分支
-  test: # 你的项目（接受同步项目），可以任意命名
-    url: "https://github.com/handsfree-work/trident-test"           # 仓库地址
-    path: "target"                    # submodule子路径
-    branch: "main"                    # 你的代码开发主分支（接受合并的分支）例如dev、main等
-    token: ""                         # 仓库token，用于提交PR, 更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
-    type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea/gitlab]
+  certd: # 你的项目（接受同步项目），可以任意命名
+    url: "https://github.com/certd/certd"  # 仓库地址
+    path: "certd"                    # submodule子路径
+    branch: "dev"                    # 你的代码开发主分支（接受合并的分支）例如dev、main、v1、v2等
+    #以下配置与PR相关，更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
+    token: ""                         # 仓库的token，用于提交PR
+    type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea]
 #  repo4:                           # 你可以配置更多仓库
 #    url: "https://xxxxxxx"
 #    path: "repo4_dir"
 #    branch: "main_branch_name"
-
+# 注意： 初始化之后，不要修改url和path，以免出现意外。但是可以添加新的repo.
 
 sync: # 同步配置，可以配置多个同步任务
   client: # 同步任务1，可以任意命名
     src: # 源仓库
-      repo: fs-admin                  # 源仓库名称，上面repo配置的仓库名称引用
-      dir: '.'                        # 要同步给target的目录
-    target: #目标仓库
-      repo: test                      # 目标仓库名称，上面repo配置的仓库名称引用
-      dir: 'package/ui/certd-client'  # 接收src同步过来的目录
+      repo: fs-admin                  # 源仓库名称，上面repo配置的仓库引用
+      dir: '.'                        # 要同步给target的目录（不能为空）
+    target: #接受合并的仓库，就是你的项目
+      repo: certd                     # 目标仓库名称，上面repo配置的仓库引用
+      dir: 'package/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置副本的目录）
+      allow_reset_to_root: False      # 是否允许重置同步分支到root commit记录，默认False即可（如果你按上面配置了副本目录。请留意sync执行时的警告信息）
       branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
   server: # 同步任务2
     src: # 同上
       repo: fs-server
       dir: '.'
     target:
-      repo: test
+      repo: certd
       dir: 'package/ui/certd-server'
       branch: 'server_sync'
 #  task3:                          # 你可以配置更多同步任务
