@@ -67,8 +67,8 @@ src
     | --core
     | --plugins
     | --ui
-        | --certd - client   //这是fs-admin-antdv的副本
-        | --certd - server   //这是fs-server-js的副本
+        | --certd-client   //这是fs-admin-antdv的副本
+        | --certd-server   //这是fs-server-js的副本
 ```
 
 为了使`certd-client`和`certd-server`能够随时同步`模版项目`的更新       
@@ -117,12 +117,11 @@ trident init
 ### 4.4 进行同步
 
 将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，等你有空时处理有冲突的PR即可
+
 ```shell
 # 以后你只需要定时运行这个命令，即可保持同步升级
 trident sync 
 ```
-
-
 
 ### 4.5 [可选] 保存 project-sync
 
