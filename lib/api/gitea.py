@@ -14,19 +14,19 @@ class GiteaClient(AbstractClient):
         super().__init__(http, token, url)
         self.api_root = f"{self.url_prefix}/api/v1"
 
-    def post_pull_request(self, title, body, src_branch, target_branch):
+    def post_pull_request(self, title, body, head_branch, base_branch):
         api = f"{self.api_root}/repos/{self.repo_path}/pulls?access_token={self.token}"
         res = self.http.post(api, data={
             "title": title,
             "body": body,
             # "head": f"{self.owner}:{src_branch}",
-            "head": f"{src_branch}",
-            "base": target_branch
+            "head": f"{head_branch}",
+            "base": base_branch
         }, res_is_standard=False, res_is_json=True)
         return res
 
-    def query_pull_request(self, src_branch, target_branch):
-        api = f"{self.api_root}/repos/{self.repo_path}/pulls?access_token={self.token}&head={src_branch}&base={target_branch}&state=open"
+    def query_pull_request(self, head_branch, base_branch, state='open'):
+        api = f"{self.api_root}/repos/{self.repo_path}/pulls?access_token={self.token}&head={head_branch}&base={base_branch}&state={state}"
         # api = f"{self.api_root}/repos/{self.repo_path}/pulls?access_token={self.token}&head={src_branch}&base={target_branch}&state=open"
         res = self.http.get(api, res_is_standard=False, res_is_json=True)
         if len(res) > 0:

@@ -14,6 +14,7 @@ repo: # 仓库列表
     #以下配置与PR相关，更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
     token: ""                         # 仓库的token，用于提交PR
     type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea]
+    auto_merge: true                  # 是否自动合并,如果有冲突则需要手动处理
 #  repo4:                           # 你可以配置更多仓库
 #    url: "https://xxxxxxx"
 #    path: "repo4_dir"
@@ -51,6 +52,5 @@ options: #选项
   repo_root: repo          # submodule保存根目录
   push: true               # 同步后是否push
   pull_request: true       # 是否创建pull request，需要目标仓库配置token和type
-  auto_merge: true         # 是否自动合并,如果有冲突则需要手动处理
   proxy_fix: true          # 是否将https代理改成http://开头
   use_system_proxy: false  # 是否使用系统代理

@@ -15,19 +15,19 @@ class GiteeClient(AbstractClient):
         super().__init__(http, token, url)
         self.api_root = "https://gitee.com/api/v5"
 
-    def post_pull_request(self, title, body, src_branch, target_branch):
+    def post_pull_request(self, title, body, head_branch, base_branch):
         api = f"{self.api_root}/repos/{self.repo_path}/pulls"
         res = self.http.post(api, data={
             "access_token": self.token,
             "title": title,
             "body": body,
-            "head": f"{self.owner}:{src_branch}",
-            "base": target_branch
+            "head": f"{self.owner}:{head_branch}",
+            "base": base_branch
         }, res_is_standard=False, res_is_json=True)
         return res
 
-    def query_pull_request(self, src_branch, target_branch):
-        api = f"{self.api_root}/repos/{self.repo_path}/pulls?access_token={self.token}&head={self.owner}:{src_branch}&base={target_branch}&state=open"
+    def query_pull_request(self, head_branch, base_branch, state='open'):
+        api = f"{self.api_root}/repos/{self.repo_path}/pulls?access_token={self.token}&head={self.owner}:{head_branch}&base={base_branch}&state={state}"
         res = self.http.get(api, res_is_standard=False, res_is_json=True)
         if len(res) > 0:
             return res[0]

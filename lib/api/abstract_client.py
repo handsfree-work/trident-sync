@@ -38,7 +38,7 @@ class AbstractClient:
         self.url_prefix = f"{res['protocol']}://{res['host']}"
         self.repo_path = f"{self.owner}/{self.repo}"
 
-    def create_pull_request(self, title, body, src_branch, target_branch, auto_merge=True):
+    def create_pull_request(self, title, body, head_branch, base_branch, auto_merge=True):
         '''
         https://try.gitea.io/api/swagger#/repository/repoCreatePullRequest
 
@@ -47,9 +47,9 @@ class AbstractClient:
           -H 'accept: application/json'
         '''
 
-        pull_res = self.query_pull_request(src_branch, target_branch)
+        pull_res = self.query_pull_request(head_branch, base_branch)
         if pull_res is None:
-            pull_res = self.post_pull_request(title, body, src_branch, target_branch)
+            pull_res = self.post_pull_request(title, body, head_branch, base_branch)
         pull_id = pull_res['number']
         if auto_merge:
             self.auto_merge(pull_id)
@@ -80,11 +80,11 @@ class AbstractClient:
             logger.info("自动合并成功")
 
     @abstractmethod
-    def post_pull_request(self, title, body, src_branch, target_branch):
+    def post_pull_request(self, title, body, head_branch, base_branch):
         pass
 
     @abstractmethod
-    def query_pull_request(self, src_branch, target_branch):
+    def query_pull_request(self, head_branch, base_branch):
         pass
 
     @abstractmethod

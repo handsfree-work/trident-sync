@@ -1,21 +1,23 @@
 import os.path
 
 from cli import read_config
+from lib.api.gitee import GiteeClient
 from lib.handler.init import InitHandler
 from lib.handler.remote import RemoteHandler
 from lib.handler.sync import SyncHandler
+from lib.http import Http
 from lib.logger import logger
 from lib.model.config import Config
 from lib.model.repo import RepoConf
+from lib.model.sync import SyncTask
 from lib.util import rm_dir, shell, save_file, read_file
-from lib.util_git import get_git_modify_file_count
 
 tmp = os.path.abspath("./tmp/sync")
-root = f"{tmp}/sync-status-save"
+root = f"{tmp}/sync-work-repo"
 dir_repos = f"{tmp}/original"
 key_sub_repo = 'sync-src-submodule'
 sub_git_url = f"https://gitee.com/handsfree-test/{key_sub_repo}"
-save_git_url = f"https://gitee.com/handsfree-test/sync-target-save"
+save_git_url = f"https://gitee.com/handsfree-test/sync-work-repo"
 
 sub_main_branch = "main"
 dir_sub_repo = f"{dir_repos}/{key_sub_repo}"
@@ -26,23 +28,26 @@ dir_src_repo = f"{dir_repos}/{key_src_repo}"
 target_sync_branch = "test_sync"
 config_dict = read_config(root, '../../../sync.yaml')
 config = Config(config_dict)
+config.set_default_token()
+
+
+def mkdirs():
+    if os.path.exists(tmp):
+        rm_dir(tmp)
+    os.makedirs(tmp)
+    os.makedirs(root)
+
+    os.makedirs(dir_repos)
+    # 初始化 sub repo
+    os.makedirs(dir_sub_repo)
+    os.chdir(root)
 
 
 def prepare():
     '''测试准备'''
 
     repo_src: RepoConf = config.repo[key_src_repo]
-
-    if os.path.exists(tmp):
-        rm_dir(tmp)
-    os.makedirs(tmp)
-    os.makedirs(root)
-    os.chdir(root)
-
-    os.makedirs(dir_repos)
-    # 初始化 sub repo
-    os.makedirs(dir_sub_repo)
-
+    mkdirs()
     os.chdir(dir_sub_repo)
     shell("git init")
     readme_content = 'submodule'
@@ -146,7 +151,7 @@ def test_sync_first():
 
 def test_set_remote():
     os.chdir(root)
-    RemoteHandler(root, remote_url=save_git_url).handle()
+    RemoteHandler(root, remote_url=save_git_url, force=True).handle()
 
 
 def test_submodule_update():
@@ -164,9 +169,6 @@ def test_clone_save_repo():
     # 删除save仓库
     os.chdir(tmp)
     rm_dir(root)
-
-    os.makedirs(root)
-    os.chdir(root)
     shell(f"git clone {save_git_url}")
 
 
@@ -184,6 +186,12 @@ def test_sync_second():
     readme = f"{target_repo_dir}/package/sync-src/sub/{key_sub_repo}/readme.md"
     readme_content = read_file(readme)
     assert readme_content == 'submodule v2'
+
+    proxy_fix = config.options.proxy_fix
+    use_system_proxy = config.options.use_system_proxy
+    http = Http(use_system_proxy=use_system_proxy, proxy_fix=proxy_fix)
+    task: SyncTask = config.sync['task']
+    client = GiteeClient(http, task.target.repo_ref.token, task.target.repo_ref.url)
 
     # origin_url = "https://github.com/handsfree-test/sync-target-save"
     # RemoteHandler(root, origin_url).handle()

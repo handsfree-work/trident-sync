@@ -8,7 +8,7 @@ repo:
     path: "target"                    # submodule子路径
     branch: "main"                    # 你的代码开发主分支（接受合并的分支）例如dev、main等
     token: ""                         # 仓库token，用于提交PR, 前往 https://github.com/settings/tokens 创建token
-    type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea/gitlab]
+    type: gitee                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea/gitlab]
     auto_merge: true
 
 sync: # 同步配置，可以配置多个同步任务
@@ -26,5 +26,4 @@ options: #选项
   push: true               # 同步后是否push
   pull_request: true       # 是否创建pr，需要目标仓库配置token和type
   proxy_fix: true          # 是否将https代理改成http://开头
-  use_system_proxy: false  # 是否使用系统代理
-  remote_git_url: "https://gitee.com/handsfree-test/sync-target-save"  # 同步仓库的远程地址（注意：这是一个全新的git仓库，用于保存同步记录与结构）
+  use_system_proxy: true  # 是否使用系统代理

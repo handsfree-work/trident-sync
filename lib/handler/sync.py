@@ -66,12 +66,12 @@ class SyncHandler:
         logger.info(f"--------------------- 开始同步 ---------------------∈")
         config = self.config
         os.chdir(self.root)
+        # 初始化一下子项目，以防万一
+        shell(f"git submodule update --init --recursive --progress")
         sms = self.repo.submodules
         if not sms:
             logger.info("还未初始化，请先执行初始化命令")
             return
-        # 初始化一下子项目，以防万一
-        shell(f"git submodule update --init --recursive --progress")
 
         conf_sync_map = config.sync
 
@@ -260,15 +260,18 @@ class TaskExecutor:
 
     def do_pull_request(self, has_push):
         key = self.key
-        if self.conf_options.pull_request:
+        if not self.conf_options.pull_request:
             return False
         if not has_push:
             return False
         token = self.conf_target.repo_ref.token
         repo_type = self.conf_target.repo_ref.type
         auto_merge = self.conf_target_repo.auto_merge
-        if not repo_type or not token:
-            logger.warning(f"{self.conf_target.repo} 未配置token 或 type，无法提交PR")
+        if not repo_type:
+            logger.warning(f"repo:{self.conf_target.repo} 未配置type，无法提交PR")
+            return False
+        if not token:
+            logger.warning(f"repo:{self.conf_target.repo} 未配置token，无法提交PR")
             return False
         else:
             client = api_clients[repo_type](self.http, token, self.conf_target.repo_ref.url)

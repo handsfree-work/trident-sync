@@ -58,6 +58,6 @@ class SyncTask:
 
     def set_repo_ref(self, task, repo_list):
         if task.repo in repo_list:
-            task.repo_ref = repo_list[self.src.repo]
+            task.repo_ref = repo_list[task.repo]
         else:
             raise Exception(f"任务[{self.key}]的{self.src.repo} 仓库配置不存在，请检查repo配置")

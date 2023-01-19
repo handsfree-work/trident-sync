@@ -12,15 +12,24 @@ from lib.util import merge_from_dict
 
 class RepoConf:
     key: str
-    url: str
-    branch: str
-    path: str
-    token: str
-    type: str
+
+    # submodule相关
+    url: str = None
+    branch: str = None
+    path: str = None
+
+    # pr 相关
+    token: str = None
+    type: str = None
     auto_merge: bool = True
 
     def __init__(self, key, conf_dict: dict):
         self.key = key
         merge_from_dict(self, conf_dict)
         if not self.url or not self.branch or not self.path:
-            raise Exception("repo中 < url/branch/path > 必须配置")
+            raise Exception(f"repo<{key}> 中 url/branch/path 必须配置")
+
+        if self.url.startswith("https://github.com"):
+            self.type = 'github'
+        elif self.url.startswith("https://gitee.com"):
+            self.type = 'gitee'

@@ -33,19 +33,23 @@ class GithubClient(AbstractClient):
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-    def post_pull_request(self, title, body, src_branch, target_branch):
+    def post_pull_request(self, title, body, head_branch, base_branch):
+        """
+        head_branch 来源分支
+        base_branch 被合并分支
+        """
         api = f"https://api.github.com/repos/{self.repo_path}/pulls"
         res = self.http.post(api, data={
             "title": title,
             "body": body,
-            "head": f"{self.owner}:{src_branch}",
-            "base": target_branch,
+            "head": f"{self.owner}:{head_branch}",
+            "base": base_branch,
             "maintainer_can_modify": True
         }, headers=self.headers, res_is_standard=False, res_is_json=True)
         return res
 
-    def query_pull_request(self, src_branch, target_branch):
-        api = f"https://api.github.com/repos/{self.repo_path}/pulls?head={self.owner}:{src_branch}&base={target_branch}&state=open"
+    def query_pull_request(self, head_branch, base_branch, state='open'):
+        api = f"https://api.github.com/repos/{self.repo_path}/pulls?head={self.owner}:{head_branch}&base={base_branch}&state={state}"
         res = self.http.get(api, headers=self.headers, res_is_standard=False, res_is_json=True)
         if len(res) > 0:
             return res[0]

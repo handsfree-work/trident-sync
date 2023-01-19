@@ -28,9 +28,8 @@ class Config:
             if repo.token:
                 continue
             if not token:
-                if repo.type:
-                    token = os.getenv(f'{repo.type}_token')
-                    if not token:
-                        token = os.getenv(f'{repo.type}_token'.upper())
+                token = os.getenv(f'{repo.type}_token')
+                if not token:
+                    token = os.getenv(f'{repo.type}_token'.upper())
             if token:
                 repo.token = token

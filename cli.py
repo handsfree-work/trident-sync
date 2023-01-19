@@ -5,8 +5,8 @@
     1. 安装git
 Usage:
     trident init [-r ROOT] [-c CONFIG]
-    trident sync [-r ROOT] [-c CONFIG] [-t token]
-    trident remote [-r ROOT] [-u URL]
+    trident sync [-r ROOT] [-c CONFIG] [-t TOKEN]
+    trident remote [-r ROOT] [-u URL] [-f]
     trident -h
 Options:
     -h,--help           显示帮助菜单
@@ -14,6 +14,7 @@ Options:
     -r,--root=ROOT      根目录  [default: .]
     -t,--token=TOKEN    PR token
     -u,--url=URL        远程地址
+    -f,--force          强制push
 Example:
     trident init
     trident sync
@@ -39,17 +40,17 @@ def cli():
     """
     args = docopt(__doc__)
     print('''
-                ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
-                ψ  ████████╗██████╗ ██╗██████╗ ███████╗███╗   ██╗████████╗  ψ
-                ψ  ╚══██╔══╝██╔══██╗██║██╔══██╗██╔════╝████╗  ██║╚══██╔══╝  ψ
-                ψ     ██║   ██████╔╝██║██║  ██║█████╗  ██╔██╗ ██║   ██║     ψ
-                ψ     ██║   ██╔══██╗██║██║  ██║██╔══╝  ██║╚██╗██║   ██║     ψ
-                ψ     ██║   ██║  ██║██║██████╔╝███████╗██║ ╚████║   ██║     ψ
-                ψ     ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     ψ 
-                ψ      https://github.com/handsfree-work/trident-sync       ψ
-                ψ              Don't be stingy with your star               ψ
-                ψ                    请不要吝啬你的star                        ψ
-                ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ ψ
+ 
+                  ████████╗██████╗ ██╗██████╗ ███████╗███╗   ██╗████████╗  
+                  ╚══██╔══╝██╔══██╗██║██╔══██╗██╔════╝████╗  ██║╚══██╔══╝  
+                     ██║   ██████╔╝██║██║  ██║█████╗  ██╔██╗ ██║   ██║     
+                     ██║   ██╔══██╗██║██║  ██║██╔══╝  ██║╚██╗██║   ██║     
+                     ██║   ██║  ██║██║██████╔╝███████╗██║ ╚████║   ██║     
+                     ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     
+                      https://github.com/handsfree-work/trident-sync       
+                              Don't be stingy with your star               
+                                    请不要吝啬你的star         
+                                                  
         ''')
     root = get_root(args)
     if not os.path.exists(root):
@@ -57,7 +58,8 @@ def cli():
     os.chdir(root)
     if args['remote']:
         remote_url = args['--url']
-        RemoteHandler(root, remote_url=remote_url).handle()
+        force = args['--force']
+        RemoteHandler(root, remote_url=remote_url, force=force).handle()
         return
 
     arg_config = get_arg(args, '--config')
