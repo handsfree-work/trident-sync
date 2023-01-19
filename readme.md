@@ -96,7 +96,7 @@ src
 
 ```shell
 # 安装本工具，安装成功后就可以使用 trident 命令了
-pip install trident-sync -u
+pip install trident-sync --upgrade
 ```
 
 ### 4.2 编写配置文件
