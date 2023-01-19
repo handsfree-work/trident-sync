@@ -28,7 +28,7 @@ sync: # 同步配置，可以配置多个同步任务
       dir: '.'                        # 要同步给target的目录（不能为空）
     target: #接受合并的仓库，就是你的项目
       repo: certd                     # 目标仓库名称，上面repo配置的仓库引用
-      dir: 'package/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置副本的目录）
+      dir: 'packages/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置副本的目录）
       allow_reset_to_root: False      # 是否允许重置同步分支到root commit记录，默认False即可（如果你按上面配置了副本目录。请留意sync执行时的警告信息）
       branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
   server: # 同步任务2
@@ -50,7 +50,7 @@ sync: # 同步配置，可以配置多个同步任务
 
 options: #选项
   repo_root: repo          # submodule保存根目录
-  push: true               # 同步后是否push
-  pull_request: true       # 是否创建pull request，需要目标仓库配置token和type
+  push: false               # 同步后是否push
+  pull_request: false       # 是否创建pull request，需要目标仓库配置token和type
   proxy_fix: true          # 是否将https代理改成http://开头
   use_system_proxy: false  # 是否使用系统代理
