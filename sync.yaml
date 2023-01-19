@@ -10,7 +10,7 @@ repo: # 仓库列表
   certd: # 你的项目（接受同步项目），可以任意命名
     url: "https://github.com/certd/certd"  # 仓库地址
     path: "certd"                    # submodule子路径
-    branch: "dev"                    # 你的代码开发主分支（接受合并的分支）例如dev、main、v1、v2等
+    branch: "v2"                    # 你的代码开发主分支（接受合并的分支）例如dev、main、v1、v2等
     #以下配置与PR相关，更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
     token: ""                         # 仓库的token，用于提交PR
     type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea]

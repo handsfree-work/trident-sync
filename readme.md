@@ -87,13 +87,12 @@ src
 ### 4.1 准备工作
 
 * 安装 [python (3.8+)](https://www.python.org/downloads/)
-* 准备你的项目和要同步的源项目仓库地址
-* 准备一个空的同步工作仓库地址，用来保存同步状态
+* 准备你的项目和要同步的源项目
 
 ### 4.2 安装本工具
 
 ```shell
-# 安装本工具
+# 安装本工具，安装成功后就可以使用 trident 命令了
 pip install trident-sync -u
 ```
 
@@ -101,21 +100,21 @@ pip install trident-sync -u
 
 * 创建一个同步工作目录，你可以任意命名，接下来都在这个目录下进行操作
 ```
-mkdir sync-work-repo
-cd sync-work-repo
+mkdir sync_work_repo
+cd sync_work_repo
 ```
 
-* 编写`sync.yaml`保存到`sync-work-repo`目录下， 下面是示例，请根据其中注释说明改成你自己的内容
+* 编写`./sync_work_repo/sync.yaml`， 下面是示例，请根据其中注释说明改成你自己的内容
 ```yaml
-# ./sync-work-repo/sync.yaml
+# ./sync_work_repo/sync.yaml
 repo: # 仓库列表，可以配置多个仓库
   fs-admin: # 上游项目1，可以任意命名
     url: "https://github.com/fast-crud/fs-admin-antdv" # 仓库地址
-    path: "fs-admin-antdv"            # submodule保存路径
+    path: "fs-admin-antdv"            # submodule保存路径，一般配置仓库名称即可
     branch: "main"                    # 要同步过来的分支
   certd: # 你的项目（接受同步项目），可以任意命名
     url: "https://github.com/certd/certd"  # 仓库地址
-    path: "certd"                    # submodule保存路径
+    path: "certd"                    # submodule保存路径，一般配置仓库名称即可
     branch: "dev"                    # 你的代码开发主分支（接受合并的分支）例如dev、main、v1、v2等
     # 以下配置与PR相关，更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
     # 不配置的话影响也不大，你可以手动操作合并
@@ -128,10 +127,10 @@ sync: # 同步配置，可以配置多个同步任务
   client: # 同步任务1，可以任意命名
     src: # 源仓库
       repo: fs-admin                  # 源仓库名称，上面repo配置的仓库引用
-      dir: '.'                        # 要同步给target的目录（不能为空）
+      dir: '.'                        # 要同步给target的目录（不能为空目录）
     target: #接受合并的仓库，就是你的项目
       repo: certd                     # 目标仓库名称，上面repo配置的仓库引用
-      dir: 'package/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置副本的目录）
+      dir: 'package/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置源仓库副本的目录）
       allow_reset_to_root: False      # 是否允许重置同步分支到root commit记录（如果你按上面配置了副本目录。请留意sync执行时的警告信息）
       branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
 
@@ -146,16 +145,17 @@ options: #其他选项 【使用默认值可以不配置】
 
 ### 4.3 初始化
 
-此命令会将`sync-work-repo`目录初始化成一个git仓库，然后将`sync.yaml`中配置的`repo` 添加为`submodule`
+此命令会将`sync_work_repo`目录初始化成一个git仓库，然后将`sync.yaml`中配置的`repo` 添加为`submodule`
 
 ```shell
-cd sync-work-repo
+cd sync_work_repo
 # 执行初始化操作
 trident init 
 ```
 
 > 只需运行一次即可，除非你添加了新的`repo`
 
+![](./doc/images/init.png)
 ### 4.4 进行同步
 
 将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，等你有空时处理有冲突的PR即可
@@ -167,9 +167,9 @@ trident sync
 
 > 注意：不要在同步分支内写你自己的任何代码
 
-### 4.5 [可选] 保存 project-sync
+### 4.5 [可选] 保存 sync_work_repo
 
-将`project-sync`提交到你的远程服务器，防止更换电脑丢失同步进度
+将`sync_work_repo`提交到远程服务器，防止更换电脑丢失同步进度
 
 ```shell
 # 给同步仓库设置远程地址，并push
@@ -180,7 +180,7 @@ trident remote --url=<sync_work_repo_git_url>
 
 ### 4.5 [可选] 定时运行
 
-你可以将 `<sync-work-repo>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
+你可以将 `<sync_work_repo>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
 ### 4.6. 合并分支
