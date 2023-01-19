@@ -77,7 +77,10 @@ src
 5. 创建`target.sync_branch` -> `target.main`的`PR`
 6. 处理`PR`，合并到开发主分支，升级完成
 
-![](./doc/images/desc.png)
+<p align="center">
+<img src="./doc/images/desc.png" />
+<p align="center">同步流程图</p>
+<p>
 
 > 没有冲突的话，同步过程可以全部自动化。    
 > 解决冲突是唯一需要手动的部分。
@@ -153,9 +156,14 @@ cd sync_work_repo
 trident init 
 ```
 
+<p align="center">
+<img src="./doc/images/init.png" />
+<p align="center">初始化执行效果</p>
+<p>
+
 > 只需运行一次即可，除非你添加了新的`repo`
 
-![](./doc/images/init.png)
+
 ### 4.4 进行同步
 
 将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，等你有空时处理有冲突的PR即可
