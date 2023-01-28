@@ -1,4 +1,5 @@
 import os.path
+import shutil
 
 from cli import read_config
 from lib.handler.init import InitHandler
@@ -9,8 +10,10 @@ from lib.model.config import Config
 from lib.model.repo import RepoConf
 from lib.util import rm_dir, shell, save_file, read_file
 
+cur_root = os.path.abspath(os.path.curdir)
+print(cur_root)
 tmp = os.path.abspath("./tmp/sync")
-root = f"{tmp}/sync-work-repo"
+work_root = f"{tmp}/sync-work-repo"
 dir_repos = f"{tmp}/original"
 key_sub_repo = 'sync-src-submodule'
 sub_git_url = f"https://gitee.com/handsfree-test/{key_sub_repo}"
@@ -23,7 +26,10 @@ key_src_repo = "sync-src"
 key_target_repo = "target"
 dir_src_repo = f"{dir_repos}/{key_src_repo}"
 target_sync_branch = "test_sync"
-config_dict = read_config(root, '../../../sync.yaml')
+sync_config_file_origin = f"{work_root}/../../../sync.yaml"
+sync_config_file_save = f"{work_root}/sync.yaml"
+
+config_dict = read_config(work_root, '../../../sync.yaml')
 config = Config(config_dict)
 config.set_default_token()
 
@@ -32,12 +38,12 @@ def mkdirs():
     if os.path.exists(tmp):
         rm_dir(tmp)
     os.makedirs(tmp)
-    os.makedirs(root)
+    os.makedirs(work_root)
 
     os.makedirs(dir_repos)
     # 初始化 sub repo
     os.makedirs(dir_sub_repo)
-    os.chdir(root)
+    os.chdir(work_root)
 
 
 def prepare():
@@ -98,6 +104,7 @@ def prepare():
     shell(f"git push -f -u origin {target_sync_branch}")
     shell(f"git push origin --delete {target_sync_branch}")
 
+    shutil.copyfile(sync_config_file_origin, sync_config_file_save)
     logger.info('test prepare success')
     return config
 
@@ -123,25 +130,25 @@ def test_prepare():
 
 
 def test_init():
-    InitHandler(root, config).handle()
-    target_readme = f"{root}/repo/target/readme.md"
+    InitHandler(work_root, config).handle()
+    target_readme = f"{work_root}/repo/target/readme.md"
     target_readme_content = read_file(target_readme)
     assert target_readme_content == 'target'
 
-    src_readme = f"{root}/repo/sync-src/readme.md"
+    src_readme = f"{work_root}/repo/sync-src/readme.md"
     src_readme_content = read_file(src_readme)
     assert src_readme_content == 'src'
 
-    sub_readme = f"{root}/repo/sync-src/sub/sync-src-submodule/readme.md"
+    sub_readme = f"{work_root}/repo/sync-src/sub/sync-src-submodule/readme.md"
     sub_readme_content = read_file(sub_readme)
     assert sub_readme_content == 'submodule'
 
 
 def test_sync_first():
     # 测试第一次同步
-    SyncHandler(root, config).handle()
+    SyncHandler(work_root, config).handle()
 
-    target_repo_dir = f"{root}/repo/target/"
+    target_repo_dir = f"{work_root}/repo/target/"
     os.chdir(target_repo_dir)
     shell(f"git checkout {target_sync_branch}")
 
@@ -155,8 +162,8 @@ def test_sync_first():
 
 
 def test_set_remote():
-    os.chdir(root)
-    RemoteHandler(root, remote_url=save_git_url, force=True).handle()
+    os.chdir(work_root)
+    RemoteHandler(work_root, remote_url=save_git_url, force=True).handle()
 
 
 def test_submodule_update():
@@ -167,20 +174,20 @@ def test_submodule_update():
 # 测试重新init
 def test_re_init():
     # 重复init测试
-    InitHandler(root, config).handle()
+    InitHandler(work_root, config).handle()
 
 
 def test_clone_save_repo():
     # 删除save仓库
     os.chdir(tmp)
-    rm_dir(root)
+    rm_dir(work_root)
     shell(f"git clone {save_git_url}")
 
 
 def test_sync_second():
     # 测试第二次同步
-    SyncHandler(root, config).handle()
-    target_repo_dir = f"{root}/repo/target/"
+    SyncHandler(work_root, config).handle()
+    target_repo_dir = f"{work_root}/repo/target/"
     os.chdir(target_repo_dir)
     shell(f"git checkout {target_sync_branch}")
 

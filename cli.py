@@ -82,7 +82,7 @@ def cli():
         logger.info(__doc__)
 
 
-def read_config(root, arg_config):
+def read_config(root, arg_config='sync.yaml'):
     config_file = f"{root}/{arg_config}"
     f = open(config_file, 'r', encoding='utf-8')
     return yaml.load(f, Loader=yaml.FullLoader)
