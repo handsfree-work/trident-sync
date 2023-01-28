@@ -53,7 +53,7 @@ class SyncTask:
     target: SyncTaskTarget = None
     copy_script: str = None
 
-    status: SyncStatus = SyncStatus()
+    status: SyncStatus
 
     def __init__(self, key, conf_sync: dict, repo_map):
         self.key = key
@@ -64,6 +64,7 @@ class SyncTask:
             raise Exception(f"sync.{key}.target 必须配置")
 
         merge_from_dict(self, conf_sync)
+        self.status = SyncStatus()
 
         self.src = SyncTaskSrc(conf_sync['src'])
         self.target = SyncTaskTarget(conf_sync['target'])

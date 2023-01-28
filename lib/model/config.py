@@ -18,7 +18,7 @@ class Config:
     sync = {}
     options: Options
 
-    status: RunStatus = RunStatus()
+    status: RunStatus
 
     def __init__(self, conf_dict):
         conf_repo = get_dict_value(conf_dict, 'repo')
@@ -28,7 +28,7 @@ class Config:
         for key in conf_sync:
             self.sync[key] = SyncTask(key, conf_sync[key], self.repo)
         conf_options = get_dict_value(conf_dict, 'options')
-
+        self.status = RunStatus()
         self.options = Options(conf_options)
 
     def set_default_token(self, token=None):
