@@ -51,33 +51,36 @@ class AbstractClient:
         if pull_res is None:
             pull_res = self.post_pull_request(title, body, head_branch, base_branch)
         pull_id = pull_res['number']
+        merged = False
         if auto_merge:
-            self.auto_merge(pull_id)
-        return pull_id
+            merged = self.auto_merge(pull_id)
+        return pull_id, merged
 
     def can_auto_merge(self, res):
         if 'mergeable' not in res:
-            logger.warning("状态未知，请手动合并PR")
+            logger.warning("Status unknown, please manually merge PR")
             return None
         mergeable = res['mergeable']
         if mergeable is True:
             return True
         if mergeable is False:
-            logger.warning("可能有冲突，请手动合并PR")
+            logger.warning("There may be conflicts, please merge PR manually")
             return False
-        logger.warning("状态未知，请手动合并PR")
+        logger.warning("Status unknown, please manually merge PR")
         return None
 
     def auto_merge(self, pull_id):
-        logger.info("5秒后检查是否自动合并")
+        logger.info("Check for can auto merge after 5 seconds")
         time.sleep(5)
         res = self.get_pull_request_detail(pull_id)
         can_merge = self.can_auto_merge(res)
         if can_merge is True:
-            logger.info("准备自动合并PR")
+            logger.info("PR will be auto merged")
             # 准备自动合并
             self.post_merge(pull_id, res)
-            logger.info("自动合并成功")
+            logger.info("Auto merge success")
+            return True
+        return False
 
     @abstractmethod
     def post_pull_request(self, title, body, head_branch, base_branch):

@@ -6,10 +6,19 @@ from lib.model.sync import SyncTask
 from lib.util import get_dict_value
 
 
+class RunStatus:
+    success: bool = False
+    change: bool = False
+    commit: bool = False
+    push: bool = False
+
+
 class Config:
     repo = {}
     sync = {}
     options: Options
+
+    status: RunStatus = RunStatus()
 
     def __init__(self, conf_dict):
         conf_repo = get_dict_value(conf_dict, 'repo')

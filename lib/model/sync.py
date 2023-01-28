@@ -14,8 +14,8 @@ from lib.util import merge_from_dict
 
 
 class SyncTaskSrc:
-    repo: str
-    dir: str
+    repo: str = None
+    dir: str = None
     repo_ref: RepoConf
 
     def __init__(self, conf_dict):
@@ -25,10 +25,10 @@ class SyncTaskSrc:
 
 
 class SyncTaskTarget:
-    repo: str
-    dir: str
-    branch: str
-    allow_reset_to_root: bool = False
+    repo: str = None
+    dir: str = None
+    branch: str = None
+    allow_reset_to_root: bool = True
     repo_ref: RepoConf
 
     def __init__(self, conf_dict):
@@ -37,10 +37,23 @@ class SyncTaskTarget:
             raise Exception("sync.[key].target 中 < repo/dir/branch > 必须配置")
 
 
+class SyncStatus:
+    success: bool = False
+    change: bool = False
+    copy: bool = False
+    commit: bool = False
+    push: bool = False
+    pr: bool = False
+    merge: bool = False
+
+
 class SyncTask:
-    key: str
-    src: SyncTaskSrc
-    target: SyncTaskTarget
+    key: str = None
+    src: SyncTaskSrc = None
+    target: SyncTaskTarget = None
+    copy_script: str = None
+
+    status: SyncStatus = SyncStatus()
 
     def __init__(self, key, conf_sync: dict, repo_map):
         self.key = key
@@ -49,6 +62,8 @@ class SyncTask:
             raise Exception(f"sync.{key}.src 必须配置")
         if 'target' not in conf_sync:
             raise Exception(f"sync.{key}.target 必须配置")
+
+        merge_from_dict(self, conf_sync)
 
         self.src = SyncTaskSrc(conf_sync['src'])
         self.target = SyncTaskTarget(conf_sync['target'])

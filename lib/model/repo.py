@@ -11,7 +11,7 @@ from lib.util import merge_from_dict
 
 
 class RepoConf:
-    key: str
+    key: str = None
 
     # submodule相关
     url: str = None

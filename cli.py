@@ -1,20 +1,21 @@
 """
 异构仓库同步升级工具
 
-前置条件:
-    1. 安装git
+Precondition:
+    1. install git
 Usage:
     trident init [-r ROOT] [-c CONFIG]
     trident sync [-r ROOT] [-c CONFIG] [-t TOKEN]
     trident remote [-r ROOT] [-u URL] [-f]
+    trident version
     trident -h
 Options:
-    -h,--help           显示帮助菜单
-    -c,--config=CONFIG  配置文件  [default: sync.yaml]
-    -r,--root=ROOT      根目录  [default: .]
+    -h,--help           show help menu, 显示帮助菜单
+    -c,--config=CONFIG  config file path, 配置文件  [default: sync.yaml]
+    -r,--root=ROOT      root dir,根目录  [default: .]
     -t,--token=TOKEN    PR token
-    -u,--url=URL        远程地址
-    -f,--force          强制push
+    -u,--url=URL        remote git url, 远程地址
+    -f,--force          force push,强制推送
 Example:
     trident init
     trident sync

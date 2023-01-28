@@ -1,15 +1,12 @@
 import os.path
 
 from cli import read_config
-from lib.api.gitee import GiteeClient
 from lib.handler.init import InitHandler
 from lib.handler.remote import RemoteHandler
 from lib.handler.sync import SyncHandler
-from lib.http import Http
 from lib.logger import logger
 from lib.model.config import Config
 from lib.model.repo import RepoConf
-from lib.model.sync import SyncTask
 from lib.util import rm_dir, shell, save_file, read_file
 
 tmp = os.path.abspath("./tmp/sync")
@@ -21,7 +18,7 @@ save_git_url = f"https://gitee.com/handsfree-test/sync-work-repo"
 
 sub_main_branch = "main"
 dir_sub_repo = f"{dir_repos}/{key_sub_repo}"
-readme_file = 'readme.md'
+readme_file = './readme.md'
 key_src_repo = "sync-src"
 key_target_repo = "target"
 dir_src_repo = f"{dir_repos}/{key_src_repo}"
@@ -85,13 +82,21 @@ def prepare():
     save_file(readme_file, readme_content)
     shell("git add .")
     shell("git commit -m \"target init\"")
+
+    readme_content = 'src-copy'
+    copy_readme_file = './package/sync-src/readme.md'
+    save_file(copy_readme_file, readme_content)
+
+    shell("git add .")
+    shell("git commit -m \"sync-src-copy\"")
+
     shell(f"git remote add origin {repo_target.url}")
     shell(f"git push -f -u origin {repo_target.branch}")
 
     # 删除远程分支
     shell(f"git branch {target_sync_branch}")
     shell(f"git push -f -u origin {target_sync_branch}")
-    shell(f"git branch -D {target_sync_branch}")
+    shell(f"git push origin --delete {target_sync_branch}")
 
     logger.info('test prepare success')
     return config
@@ -186,12 +191,3 @@ def test_sync_second():
     readme = f"{target_repo_dir}/package/sync-src/sub/{key_sub_repo}/readme.md"
     readme_content = read_file(readme)
     assert readme_content == 'submodule v2'
-
-    proxy_fix = config.options.proxy_fix
-    use_system_proxy = config.options.use_system_proxy
-    http = Http(use_system_proxy=use_system_proxy, proxy_fix=proxy_fix)
-    task: SyncTask = config.sync['task']
-    client = GiteeClient(http, task.target.repo_ref.token, task.target.repo_ref.url)
-
-    # origin_url = "https://github.com/handsfree-test/sync-target-save"
-    # RemoteHandler(root, origin_url).handle()

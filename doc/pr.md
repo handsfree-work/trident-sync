@@ -50,9 +50,7 @@ token所属账号要求（如果账号本身就是`仓库拥有者`，可以无�
 从管理AccessToken栏目中创建token （将your.gitea.host 替换成你的实际gitea地址）     
 https://your.gitea.host/user/settings/applications
 
-## 4、 gitlab token
 
-暂未实现
 
 
 

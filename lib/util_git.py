@@ -24,7 +24,7 @@ def get_git_modify_file_count():
     count = 0
     for line in lines:
         start = line.find(':   ')
-        if (start < 0):
+        if start < 0:
             continue
         start += 1
         file = line[start:].strip()
@@ -43,7 +43,7 @@ def checkout_branch(repo: Repo, branch: str):
     创建或更新分支，如果远程有，则从远程拉取
     '''
     # 看看远程是否有对应分支
-    logger.info(f"checkout同步分支：{branch}")
+    logger.info(f"checkout branch：{branch}")
 
     origin_key = f"origin/{branch}"
     origin_exists = False

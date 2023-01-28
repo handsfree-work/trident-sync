@@ -1,21 +1,14 @@
-# trident-sync 🔱 三叉戟同步
+# 🔱 trident-sync 三叉戟同步
 
 三叉戟同步，是一款异构项目同步升级工具，二次开发同步神器。
 
-[中文](./readme.md) / [English](./readme-en.md)
+[中文](./readme.md) 
 
 ## 1. 简介
 
 当我们的项目内部使用了其他模版项目进行二次开发，那么那个模版项目就永远停留在当时的版本，无法方便的更新。
 
-本项目可以自动获取变更并合并到你的项目仓库，让集成的模版项目持续升级。
-
-本项目支持各类异构项目的同步升级
-
-* `多个模版项目` 同步到 `你项目的多个目录`
-* `模版项目的多个目录` 同步到 `你项目的多个目录`
-* `你项目的多个目录` 同步到 `多个模版项目`
-* `你项目的多个目录` 同步到 `模版项目的多个目录`
+本项目可以自动获取变更并合并到你的项目仓库，让二次开发项目可以持续升级。
 
 ## 2. 缘起
 
@@ -26,8 +19,8 @@
 ```
 src
 | --packages
-    | --core           //实现申请证书的核心
-    | --plugins        //一些任务插件，部署证书到远程服务器、云服务之上。
+    | --core           
+    | --plugins        
 
 ```
 
@@ -37,7 +30,7 @@ src
 * [fs-admin-antdv](https://github.com/fast-crud/fs-admin-antdv)  （前端admin模版）
 * [fs-server-js](https://github.com/fast-crud/fs-server-js)  （服务端）
 
-我把这两个项目复制到了`certd`项目中,进行二次开发。     
+我把这两个项目复制到了`certd`项目中，进行二次开发。     
 此时`certd`项目目录结构变成如下：
 
 ```
@@ -90,6 +83,7 @@ src
 ### 4.1 准备工作
 
 * 安装 [python (3.8+)](https://www.python.org/downloads/)
+* 安装 `git`
 * 准备你的项目和要同步的源项目
 
 ### 4.2 安装本工具
@@ -112,15 +106,15 @@ cd sync_work_repo
 # ./sync_work_repo/sync.yaml
 repo: # 仓库列表，可以配置多个仓库
   fs-admin: # 上游项目1，可以任意命名
-    url: "https://github.com/fast-crud/fs-admin-antdv" # 仓库地址
+    url: "https://github.com/fast-crud/fs-admin-antdv" # 源仓库地址
     path: "fs-admin-antdv"            # submodule保存路径，一般配置仓库名称即可
     branch: "main"                    # 要同步过来的分支
   certd: # 你的项目（接受同步项目），可以任意命名
-    url: "https://github.com/certd/certd"  # 仓库地址
+    url: "https://github.com/certd/certd"  # 目标仓库地址
     path: "certd"                    # submodule保存路径，一般配置仓库名称即可
     branch: "dev"                    # 你的代码开发主分支（接受合并的分支）例如dev、main、v1、v2等
     # 以下配置与PR相关，更多关于PR的文档请前往 https://github.com/handsfree-work/trident-sync/tree/main/doc/pr.md
-    # 不配置的话影响也不大，你可以手动操作合并
+    # 第一次使用，你可以暂时不配置，同步完之后需要手动操作合并
     token: ""                         # 仓库的token，用于提交PR
     type: github                      # 仓库类型，用于提交PR，可选项：[github/gitee/gitea]
     auto_merge: true                  # 是否自动合并,如果有冲突则需要手动处理
@@ -134,7 +128,6 @@ sync: # 同步配置，可以配置多个同步任务
     target: #接受合并的仓库，就是你的项目
       repo: certd                     # 目标仓库名称，上面repo配置的仓库引用
       dir: 'package/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置源仓库副本的目录）
-      allow_reset_to_root: False      # 是否允许重置同步分支到root commit记录（如果你按上面配置了副本目录。请留意sync执行时的警告信息）
       branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
 
 options: #其他选项 【使用默认值可以不配置】
@@ -166,36 +159,54 @@ trident init
 
 ### 4.4 进行同步
 
-将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，等你有空时处理有冲突的PR即可
+将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，[你需要视情况处理PR](#合并分支)
 
 ```shell
 # 以后你只需要定时运行这个命令，即可保持同步升级
 trident sync 
 ```
 
-> 注意：不要在同步分支内写你自己的任何代码
+运行效果
+```
+2023-01-28 14:13:41 | INFO    | - refs:[<git.Head "refs/heads/main">]
+2023-01-28 14:13:41 | WARNING | - Skip push，The remote address is not set for the current repository. Use the [trident remote <repo_url>] command to set the remote address of the repository and save the synchronization progress
+2023-01-28 14:13:41 | INFO    | - ----------------result:✅----------------
+ 🏹 task            -->  success:✅     copy:✅   change:✅   commit:✅     push:✅       pr:✅    merge:✅
+ 🔱 sync_work_repo  -->   change:✅   commit:✅     push:🚫 
+2023-01-28 14:13:41 | INFO    | - ----------------sync end----------------
+```
+
+> 注意：不要在同步分支内写你自己的任何代码（示例配置中为`client_sync`分支）
 
 ### 4.5 [可选] 保存 sync_work_repo
 
-将`sync_work_repo`提交到远程服务器，防止更换电脑丢失同步进度
+将`sync_work_repo`提交到远程服务器，防止更换电脑丢失同步进度。    
+后续你只需要`clone` `sync_work_repo` ，然后直接运行`trident sync`即可继续同步
 
 ```shell
 # 给同步仓库设置远程地址，并push
 trident remote --url=<sync_work_repo_git_url> 
+
+# 或者运行如下命令，一样的
+git remote add origin <sync_work_repo_git_url> 
+git push
 ```
-> 注意： `sync_work_repo_git_url` 应该是一个空的远程仓库     
+> 注意： `sync_work_repo_git_url` 应该是一个新的空的远程仓库     
 > 如果不是空的，可以加 `-f` 选项强制push（sync_work_repo原有的内容会被覆盖）。
 
-### 4.5 [可选] 定时运行
+
+
+### 4.6 [可选] 定时运行
 
 你可以将 `<sync_work_repo>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
-### 4.6. 合并分支
 
-同步完之后，将会有三种情况：
+### 4.7. 合并分支
 
-* 启用PR： [如何启用PR？](#启用PR)
+源仓库如果有更新，那么同步完之后，将会有三种情况：
+
+* 启用了PR： [如何启用PR？](#启用PR)
     * 无冲突：自动创建PR，然后自动合并，你无需任何操作
     * 有冲突：自动创建PR，然后需要 [手动处理PR](#处理PR)
 * 未启用PR：
@@ -217,7 +228,7 @@ repo:
 [token如何获取？](./doc/pr.md)
 
 
-#### 处理PR
+#### 2. 处理PR
 
 当PR有冲突时，就需要手动处理冲突，才能合并进入主分支
 
@@ -247,14 +258,8 @@ target:<sync_branch> -------->  target:<main_branch>
 
 总结就是六个字： 不删、少改、多加。
 
-## 6. 其他问题：
 
-### 5.1 为何不fork模版项目，通过submodule来管理
+## 5. 自动化
 
-这是我最初采用的方法，确实可以通过set-upstream,然后进行合并来进行同步升级。        
-但管理众多的submodule仍然是一件费力且很容易出错的事情，比如：
-
-* 想要采用git-flow模式，就得频繁切换所有的submodule的分支
-* 想要管控main分支的提交权限，多个submodule相当繁琐
-* lerna不支持submodule模块的发布
-
+### 5.1 github action
+进行中

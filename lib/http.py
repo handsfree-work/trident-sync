@@ -41,7 +41,7 @@ class Http:
         self.proxies = proxies
 
     def options(self, url, cookies=None, headers=None, **kwargs):
-        self.logger.info(f"http request[options] url:{url}")
+        self.logger.debug(f"http request[options] url:{url}")
         if headers is None:
             headers = {}
         if 'Content-Type' not in headers:
@@ -49,11 +49,11 @@ class Http:
         session = requests.Session()
         session.trust_env = False
         response = session.options(url, proxies=self.proxies, headers=headers, cookies=cookies, **kwargs)
-        self.logger.info("http response: " + response.text)
+        self.logger.debug("http response: " + response.text)
         return
 
     def post(self, url, data, res_is_json=True, res_is_standard=True, cookies=None, headers=None, **kwargs):
-        self.logger.info(f"http request[post] url:{url}")
+        self.logger.debug(f"http request[post] url:{url}")
         if headers is None:
             headers = {}
         if 'Content-Type' not in headers:
@@ -64,11 +64,11 @@ class Http:
         session.trust_env = False
         response = session.post(url, json=data, proxies=self.proxies, headers=headers, cookies=cookies,
                                 verify=self.verify, **kwargs)
-        self.logger.info("http response: " + response.text)
+        self.logger.debug("http response: " + response.text)
         return self.res_handle(response, res_is_json, res_is_standard)
 
     def put(self, url, data, res_is_json=True, res_is_standard=True, cookies=None, headers=None, **kwargs):
-        self.logger.info(f"http request[put] url:{url}")
+        self.logger.debug(f"http request[put] url:{url}")
         if headers is None:
             headers = {}
         if 'Content-Type' not in headers:
@@ -79,11 +79,11 @@ class Http:
         session.trust_env = False
         response = session.put(url, json=data, proxies=self.proxies, headers=headers, cookies=cookies,
                                verify=self.verify, **kwargs)
-        self.logger.info("http response: " + response.text)
+        self.logger.debug("http response: " + response.text)
         return self.res_handle(response, res_is_json, res_is_standard)
 
     def get(self, url, headers=None, res_is_json=True, res_is_standard=True):
-        self.logger.info(f"http request[get] url:{url}")
+        self.logger.debug(f"http request[get] url:{url}")
         if headers is None:
             headers = {}
         if 'Content-Type' not in headers:
@@ -91,7 +91,7 @@ class Http:
         session = requests.Session()
         session.trust_env = False
         response = session.get(url, proxies=self.proxies, verify=self.verify, headers=headers)
-        self.logger.info("http response: " + response.text)
+        self.logger.debug("http response: " + response.text)
         return self.res_handle(response, res_is_json, res_is_standard)
 
     def download(self, url, save_path, on_progress=None):

@@ -50,7 +50,7 @@ class GiteeClient(AbstractClient):
         }, res_is_standard=False, res_is_json=True)
 
     def post_review(self, pull_id):
-        logger.info("强制通过review")
+        logger.info("force approve review")
         api = f"{self.api_root}/repos/{self.repo_path}/pulls/{pull_id}/review"
         self.http.post(api, data={
             "access_token": self.token,
@@ -58,7 +58,7 @@ class GiteeClient(AbstractClient):
         }, res_is_standard=False, res_is_json=False)
 
     def post_test(self, pull_id):
-        logger.info("强制通过test")
+        logger.info("force approve test")
         api = f"{self.api_root}/repos/{self.repo_path}/pulls/{pull_id}/test"
         self.http.post(api, data={
             "access_token": self.token,

@@ -22,7 +22,6 @@ class InitHandler:
         """
         root = self.root
         config: Config = self.config
-        logger.info(f"即将在{root}目录初始化同步项目")
         logger.info(f"git init : {root}")
         os.chdir(root)
         shell('git init')
@@ -41,7 +40,7 @@ class InitHandler:
             added = False
             for module in sms:
                 if key == module.name:
-                    logger.info(f"{key} 已经加入submodule")
+                    logger.info(f"{key} has been added to the submodule")
                     added = True
                     break
             if added:
@@ -52,13 +51,13 @@ class InitHandler:
             # repo.create_submodule(key, path, url=item['url'], branch=item['branch'])
             shell(f"git submodule add -b {item.branch} --name {key} {item.url} {path}")
 
-        logger.info("更新所有仓库")
+        logger.info("Update all submodule")
 
         shell(f"git submodule update --init --recursive --progress")
         repo.iter_submodules()
         add_and_commit('🔱: sync init [trident-sync]')
         os.chdir(os.getcwd())
-        logger.info("初始化完成")
+        logger.info("init success")
         repo.close()
 
     def save_ignore_file(self):

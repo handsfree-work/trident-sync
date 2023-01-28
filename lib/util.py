@@ -52,11 +52,11 @@ def shell(cmd, ignore_errors=False, get_out=False):
 
     p = sp.run(cmd, shell=True, encoding='utf-8', stdout=out)
     if p.returncode != 0 and not ignore_errors:
-        print(p.stdout)
-        print(p.stderr)
+        logger.debug(p.stdout)
+        logger.debug(p.stderr)
         raise Exception(p.stderr)
     if get_out and p.stdout:
-        print(p.stdout)
+        logger.debug(p.stdout)
     return p.stdout
 
 
@@ -70,6 +70,9 @@ def read_file(file_path):
 
 
 def save_file(file_path, content):
+    dir_path = os.path.dirname(file_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
     fo = open(file_path, "w")
     fo.write(content)
     fo.close()
