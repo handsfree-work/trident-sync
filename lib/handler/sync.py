@@ -79,6 +79,7 @@ class SyncHandler:
         os.chdir(self.root)
         # 初始化一下子项目，以防万一
         shell(f"git submodule update --init --recursive --progress")
+        self.repo.iter_submodules()
         sms = self.repo.submodules
         if not sms:
             logger.info("Not initialized yet, please execute the [trident init] command first")
