@@ -20,7 +20,7 @@ Example:
     trident sync
     trident remote --url=https://github.com/handsfree-work/trident-test-sync
 """
-
+import pkg_resources
 import os
 
 import yaml
@@ -32,6 +32,7 @@ from lib.handler.sync import SyncHandler
 from lib.logger import logger
 from lib.model.config import Config
 from lib.util import get_arg
+from lib.version import get_version
 
 
 def cli():
@@ -39,7 +40,10 @@ def cli():
     异构仓库同步升级工具入口
     """
     args = docopt(__doc__)
-    print('''
+
+    version = get_version()
+
+    print(f'''
  
                   ████████╗██████╗ ██╗██████╗ ███████╗███╗   ██╗████████╗  
                   ╚══██╔══╝██╔══██╗██║██╔══██╗██╔════╝████╗  ██║╚══██╔══╝  
@@ -48,8 +52,8 @@ def cli():
                      ██║   ██║  ██║██║██████╔╝███████╗██║ ╚████║   ██║     
                      ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     
                       https://github.com/handsfree-work/trident-sync       
-                              Don't be stingy with your star               
-                                    请不要吝啬你的star         
+                    Don't be stingy with your star ( 请不要吝啬你的star )
+                       Copyright © 2023 greper@handsfree.work v{version}    
                                                   
         ''')
     root = get_root(args)

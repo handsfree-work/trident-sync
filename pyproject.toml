@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "trident-sync"
 version = "1.0.4"
-description = "三叉戟，异构项目同步升级工具，The heterogeneous repo sync and upgrade CLI"
+description = "三叉戟，二次开发项目同步升级工具，Secondary development repo sync and upgrade CLI"
 authors = ["xiaojunnuo <xiaojunnuo@qq.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "lib" }, { include = "cli.py" }]
+packages = [{ include = "lib" }, { include = "cli.py" }, { include = "pyproject.toml" }]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4"
