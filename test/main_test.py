@@ -26,12 +26,15 @@ key_src_repo = "sync-src"
 key_target_repo = "target"
 dir_src_repo = f"{dir_repos}/{key_src_repo}"
 target_sync_branch = "test_sync"
-sync_config_file_origin = f"{work_root}/../../../sync.yaml"
+sync_config_file_origin = os.path.abspath("sync.yaml")
 sync_config_file_save = f"{work_root}/sync.yaml"
 
-config_dict = read_config(work_root, '../../../sync.yaml')
-config = Config(config_dict)
-config.set_default_token()
+
+def get_config():
+    config_dict = read_config(sync_config_file_origin)
+    config = Config(config_dict)
+    config.set_default_token()
+    return config
 
 
 def mkdirs():
@@ -48,7 +51,7 @@ def mkdirs():
 
 def prepare():
     '''测试准备'''
-
+    config = get_config()
     repo_src: RepoConf = config.repo[key_src_repo]
     mkdirs()
     os.chdir(dir_sub_repo)
@@ -110,6 +113,7 @@ def prepare():
 
 
 def submodule_update():
+    config = get_config()
     repo_src: RepoConf = config.repo[key_src_repo]
     submodule_dir = f"{dir_src_repo}/sub/{key_sub_repo}"
     os.chdir(submodule_dir)
@@ -130,6 +134,7 @@ def test_prepare():
 
 
 def test_init():
+    config = get_config()
     InitHandler(work_root, config).handle()
     target_readme = f"{work_root}/repo/target/readme.md"
     target_readme_content = read_file(target_readme)
@@ -145,6 +150,7 @@ def test_init():
 
 
 def test_sync_first():
+    config = get_config()
     # 测试第一次同步
     SyncHandler(work_root, config).handle()
 
@@ -160,6 +166,9 @@ def test_sync_first():
     readme_content = read_file(readme)
     assert readme_content == 'submodule'
 
+    assert config.sync['task1'].status.merge is False
+    assert config.status.push is False
+
 
 def test_set_remote():
     os.chdir(work_root)
@@ -174,6 +183,7 @@ def test_submodule_update():
 # 测试重新init
 def test_re_init():
     # 重复init测试
+    config = get_config()
     InitHandler(work_root, config).handle()
 
 
@@ -186,6 +196,7 @@ def test_clone_save_repo():
 
 def test_sync_second():
     # 测试第二次同步
+    config = get_config()
     SyncHandler(work_root, config).handle()
     target_repo_dir = f"{work_root}/repo/target/"
     os.chdir(target_repo_dir)
@@ -198,3 +209,6 @@ def test_sync_second():
     readme = f"{target_repo_dir}/package/sync-src/sub/{key_sub_repo}/readme.md"
     readme_content = read_file(readme)
     assert readme_content == 'submodule v2'
+
+    assert config.sync['task1'].status.merge is False
+    assert config.status.push is True

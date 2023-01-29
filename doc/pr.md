@@ -1,5 +1,8 @@
 # 启用PR
 
+
+## PR配置
+
 同步成功后，支持自动创建PR
 
 要开启此功能需要给对应的 `target_repo` 配置 `token` 和 `type`
@@ -15,9 +18,19 @@ repo:
     auto_merge: true # PR没冲突时，是否自动合并
 ```
 
-# token创建
+## token配置方式
+token有两种配置方式
+1. 如上所示，在sync.yaml文件中配置
+2. 也可以通过环境变量设置，变量名格式为：trident_token_{type} 
+```shell
+# 例如：
+export trident_token_github=ghp_xxxxxxxxxxxxxxxxxxxx
+```
+   
 
-## 1、 github token
+## token创建
+
+### 1、 github token
 
 从此处创建token: https://github.com/settings/tokens
 
@@ -25,12 +38,20 @@ repo:
 要注意如下几点：
 
 1. 选择正确的 `Resource owner`
+![](./images/github-token-owner.png)
 2. `Repository access`,要选择 `All repositories` 或者 `Only select repositories(选择特定仓库)`
 3. `Repository permissions` 中的 `Contents ` `Pull requests` 都要选择`read and write`
+![](./images/github-token-contents.png)
+![](./images/github-token-pull-request.png)
+
+
+
 
 如果是 `Personal access tokens (classic)`
 
 1. 只需要勾选 `repo` 即可
+![](./images/github-token-repo.png)
+
 
 ## 2、 gitee token
 

@@ -39,6 +39,6 @@ class Config:
             if not token:
                 token = os.getenv(f'{repo.type}_token')
                 if not token:
-                    token = os.getenv(f'{repo.type}_token'.upper())
+                    token = os.getenv(f'trident_token_{repo.type}')
             if token:
                 repo.token = token

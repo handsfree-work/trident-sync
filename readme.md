@@ -2,13 +2,19 @@
 
 三叉戟同步，是一款异构项目同步升级工具，二次开发同步神器。
 
-[中文](./readme.md) 
+[中文](./readme.md)
 
 ## 1. 简介
 
-当我们的项目内部使用了其他模版项目进行二次开发，那么那个模版项目就永远停留在当时的版本，无法方便的更新。
+当我们的项目内部使用了其他模版项目进行二次开发，那么那个模版项目就只能停留在当时的版本，无法方便的更新。
 
-本项目可以自动获取变更并合并到你的项目仓库，让二次开发项目可以持续升级。
+本工具可以自动获取变更并合并到你的项目仓库，让二次开发项目可以持续升级。
+
+本工具适用于所有不能简单fork就可以二次开发的场景：
+
+* 模版项目与你的项目目录结构不一致（异构）。
+* 模版项目的submodule过多，一个个fork太麻烦。
+* 不想管理众多submodule
 
 ## 2. 缘起
 
@@ -93,15 +99,17 @@ src
 pip install trident-sync --upgrade
 ```
 
-### 4.2 编写配置文件
+### 4.3 编写配置文件
 
 * 创建一个同步工作目录，你可以任意命名，接下来都在这个目录下进行操作
+
 ```
 mkdir sync_work_repo
 cd sync_work_repo
 ```
 
 * 编写`./sync_work_repo/sync.yaml`， 下面是示例，请根据其中注释说明改成你自己的内容
+
 ```yaml
 # ./sync_work_repo/sync.yaml
 repo: # 仓库列表，可以配置多个仓库
@@ -127,19 +135,23 @@ sync: # 同步配置，可以配置多个同步任务
       dir: '.'                        # 要同步给target的目录（不能为空目录）
     target: #接受合并的仓库，就是你的项目
       repo: certd                     # 目标仓库名称，上面repo配置的仓库引用
-      dir: 'package/ui/certd-client'  # 接收src同步过来的目录（如果你之前已经使用过源仓库副本做了一部分特性开发，那么这里配置源仓库副本的目录）
+      dir: 'package/ui/certd-client'  # 接收src同步过来的目录
+      # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑如果你之前已经使用源仓库副本做了一部分特性开发，那么这里配置源仓库副本的目录）
       branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
 
-options: #其他选项 【使用默认值可以不配置】
+options: #其他选项
   repo_root: repo          # submodule保存根目录
-  push: true               # 同步后是否push
+  push: false              # 同步后是否push
   pull_request: true       # 是否创建pull request，需要目标仓库配置token和type
   proxy_fix: true          # 是否将https代理改成http://开头，解决python开启代理时无法发出https请求的问题
   use_system_proxy: true   # 是否使用系统代理
 
 ```
 
-### 4.3 初始化
+> 第一次使用，先本地测试，不push    
+> 本地测试同步没有问题，之后再设置options.push=true
+
+### 4.4 初始化
 
 此命令会将`sync_work_repo`目录初始化成一个git仓库，然后将`sync.yaml`中配置的`repo` 添加为`submodule`
 
@@ -154,10 +166,12 @@ trident init
 <p align="center">初始化执行效果</p>
 <p>
 
-> 只需运行一次即可，除非你添加了新的`repo`
+> 只需运行一次即可，除非你添加了新的`repo`    
 
+> 初始化过程会将多个仓库添加为submodule，此步骤在网络不好时容易出问题   
+> 你可以删除目录下除`sync.yaml`之外的所有文件，重新运行`trident init`命令
 
-### 4.4 进行同步
+### 4.5 进行同步
 
 将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，[你需要视情况处理PR](#合并分支)
 
@@ -167,6 +181,7 @@ trident sync
 ```
 
 运行效果
+
 ```
 2023-01-28 14:13:41 | INFO    | - refs:[<git.Head "refs/heads/main">]
 2023-01-28 14:13:41 | WARNING | - Skip push，The remote address is not set for the current repository. Use the [trident remote <repo_url>] command to set the remote address of the repository and save the synchronization progress
@@ -178,7 +193,7 @@ trident sync
 
 > 注意：不要在同步分支内写你自己的任何代码（示例配置中为`client_sync`分支）
 
-### 4.5 [可选] 保存 sync_work_repo
+### 4.6 [可选] 保存 sync_work_repo
 
 将`sync_work_repo`提交到远程服务器，防止更换电脑丢失同步进度。    
 后续你只需要`clone` `sync_work_repo` ，然后直接运行`trident sync`即可继续同步
@@ -191,18 +206,16 @@ trident remote --url=<sync_work_repo_git_url>
 git remote add origin <sync_work_repo_git_url> 
 git push
 ```
+
 > 注意： `sync_work_repo_git_url` 应该是一个新的空的远程仓库     
 > 如果不是空的，可以加 `-f` 选项强制push（sync_work_repo原有的内容会被覆盖）。
 
-
-
-### 4.6 [可选] 定时运行
+### 4.7 [可选] 定时运行
 
 你可以将 `<sync_work_repo>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
-
-### 4.7. 合并分支
+### 4.8 合并分支
 
 源仓库如果有更新，那么同步完之后，将会有三种情况：
 
@@ -227,8 +240,7 @@ repo:
 
 [token如何获取？](./doc/pr.md)
 
-
-#### 2. 处理PR
+#### 处理PR
 
 当PR有冲突时，就需要手动处理冲突，才能合并进入主分支
 
@@ -258,8 +270,8 @@ target:<sync_branch> -------->  target:<main_branch>
 
 总结就是六个字： 不删、少改、多加。
 
-
 ## 5. 自动化
 
 ### 5.1 github action
+
 进行中

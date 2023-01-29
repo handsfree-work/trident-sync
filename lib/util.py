@@ -63,7 +63,7 @@ def shell(cmd, ignore_errors=False, get_out=False):
 def read_file(file_path):
     if not os.path.exists(file_path):
         return None
-    fo = open(file_path, "r")
+    fo = open(file_path, "r", encoding='utf-8')
     content = fo.read()
     fo.close()
     return content
@@ -73,7 +73,7 @@ def save_file(file_path, content):
     dir_path = os.path.dirname(file_path)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
-    fo = open(file_path, "w")
+    fo = open(file_path, "w", encoding='utf-8')
     fo.write(content)
     fo.close()
 
@@ -117,7 +117,10 @@ def rm_dir(root):
 def get_arg(args, key):
     value = args[key]
     if isinstance(value, list):
-        value = value[0]
+        if len(value) > 0:
+            value = value[0]
+        else:
+            return None
     return value
 
 

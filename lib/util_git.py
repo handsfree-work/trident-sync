@@ -1,10 +1,13 @@
+import os
 import time
 
 from git import Repo
 
 from lib.logger import logger
+from lib.model.config import RunStatus
 from lib.model.repo import RepoConf
-from lib.util import shell
+from lib.util import shell, check_need_push
+
 
 
 def add_and_commit(message):

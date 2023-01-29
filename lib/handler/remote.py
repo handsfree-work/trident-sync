@@ -8,14 +8,14 @@ from lib.util import shell
 
 class RemoteHandler:
 
-    def __init__(self, root, remote_url=None, force=False):
-        self.root = root
+    def __init__(self, work_root, remote_url=None, force=False):
+        self.work_root = work_root
         self.remote_url = remote_url
         self.force = force
 
     def handle(self):
-        os.chdir(self.root)
-        repo = git.Repo(path=self.root)
+        os.chdir(self.work_root)
+        repo = git.Repo(path=self.work_root)
         cur_branch_name = repo.head.reference
         url = self.remote_url
         if 'origin' not in repo.remotes and not url:

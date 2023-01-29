@@ -1,31 +1,33 @@
+import datetime
 import os
 import time
 
 import git
 
+from lib.handler.helper import save_work_repo
 from lib.logger import logger
 from lib.model.config import Config
 from lib.model.repo import RepoConf
-from lib.util import shell, save_file
-from lib.util_git import add_and_commit
+from lib.util import shell, save_file, check_need_push
+from lib.util_git import add_and_commit, get_git_modify_file_count
 
 
 class InitHandler:
 
-    def __init__(self, root, config):
-        self.root = root
+    def __init__(self, work_root, config):
+        self.work_root = work_root
         self.config = config
 
     def handle(self):
         """
         处理 init 命令
         """
-        root = self.root
+        work_root = self.work_root
         config: Config = self.config
-        logger.info(f"git init : {root}")
-        os.chdir(root)
+        logger.info(f"git init : {work_root}")
+        os.chdir(work_root)
         shell('git init')
-        repo = git.Repo(path=root)
+        repo = git.Repo(path=work_root)
         if len(repo.heads) == 0:
             self.save_ignore_file()
             shell("git add .")
@@ -55,13 +57,13 @@ class InitHandler:
 
         shell(f"git submodule update --init --recursive --progress")
         repo.iter_submodules()
-        add_and_commit('🔱: sync init [trident-sync]')
+        save_work_repo(repo, '🔱: sync init [trident-sync]', push=config.options.push)
         os.chdir(os.getcwd())
         logger.info("init success")
         repo.close()
 
     def save_ignore_file(self):
-        ignore_file = f"{self.root}/.gitignore"
+        ignore_file = f"{self.work_root}/.gitignore"
         ignore = '''
 .idea
 .vscode

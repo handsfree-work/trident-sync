@@ -5,23 +5,23 @@ Precondition:
     1. install git
 Usage:
     trident init [-r ROOT] [-c CONFIG]
-    trident sync [-r ROOT] [-c CONFIG] [-t TOKEN]
+    trident sync [-r ROOT] [-c CONFIG] [-t TOKEN] [-i]
     trident remote [-r ROOT] [-u URL] [-f]
     trident version
     trident -h
 Options:
     -h,--help           show help menu, 显示帮助菜单
     -c,--config=CONFIG  config file path, 配置文件  [default: sync.yaml]
-    -r,--root=ROOT      root dir,根目录  [default: .]
+    -r,--root=ROOT      root dir, 根目录  [default: .]
     -t,--token=TOKEN    PR token
     -u,--url=URL        remote git url, 远程地址
-    -f,--force          force push,强制推送
+    -f,--force          force push, 强制推送
+    -i,--init           init first, 同步前先初始化
 Example:
     trident init
     trident sync
     trident remote --url=https://github.com/handsfree-work/trident-test-sync
 """
-import pkg_resources
 import os
 
 import yaml
@@ -59,16 +59,17 @@ def cli():
         ''')
     root = get_root(args)
     if not os.path.exists(root):
-        os.mkdir(root)
+        os.makedirs(root)
+
+    arg_config = get_arg(args, '--config')
+    config_dict = read_config(arg_config)
+
     os.chdir(root)
     if args['remote']:
         remote_url = args['--url']
         force = args['--force']
         RemoteHandler(root, remote_url=remote_url, force=force).handle()
         return
-
-    arg_config = get_arg(args, '--config')
-    config_dict = read_config(root, arg_config)
 
     token_from_args = get_arg(args, '--token')
     config = Config(config_dict)
@@ -77,20 +78,24 @@ def cli():
     if args['init']:
         InitHandler(root, config).handle()
     elif args['sync']:
+        init_first = get_arg(args, '--init')
+        if init_first:
+            logger.info("init first")
+            InitHandler(root, config).handle()
         SyncHandler(root, config).handle()
     else:
         logger.info(__doc__)
 
 
-def read_config(root, arg_config='sync.yaml'):
-    config_file = f"{root}/{arg_config}"
+def read_config(arg_config='./sync.yaml'):
+    config_file = os.path.abspath(f"{arg_config}")
     f = open(config_file, 'r', encoding='utf-8')
     return yaml.load(f, Loader=yaml.FullLoader)
 
 
 def get_root(args):
     root = get_arg(args, '--root')
-    return f"{os.getcwd()}/{root}"
+    return os.path.abspath(root)
 
 
 if __name__ == '__main__':
