@@ -4,4 +4,4 @@ import loguru
 
 logger = loguru.logger
 logger.remove(0)
-logger.add(stdout, format="<level>{time:YYYY-MM-DD HH:mm:ss} | {level:7} | - {message}</level>", colorize=True)
+logger.add(stdout, format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level:7}</level> | - <level>{message}</level>", colorize=True)

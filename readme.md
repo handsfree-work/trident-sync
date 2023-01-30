@@ -6,15 +6,15 @@
 
 ## 1. 简介
 
-当我们的项目内部使用了其他模版项目进行二次开发，那么那个模版项目就只能停留在当时的版本，无法方便的更新。
+当我们的项目内部使用了其他项目进行二次开发，那么这个模块就只能停留在当时的版本，无法方便的更新。
 
 本工具可以自动获取变更并合并到你的项目仓库，让二次开发项目可以持续升级。
 
 本工具适用于所有不能简单fork就可以二次开发的场景：
 
-* 模版项目与你的项目目录结构不一致（异构）。
-* 模版项目的submodule过多，一个个fork太麻烦。
-* 不想管理众多submodule
+* 源项目与你项目目录结构不一致（异构）。
+* 源项目本身的submodule过多，一个个fork，merge太麻烦。
+* 源项目只是你项目的一个子模块，但你不想用submodule
 
 ## 2. 缘起
 
@@ -136,20 +136,18 @@ sync: # 同步配置，可以配置多个同步任务
     target: #接受合并的仓库，就是你的项目
       repo: certd                     # 目标仓库名称，上面repo配置的仓库引用
       dir: 'package/ui/certd-client'  # 接收src同步过来的目录
-      # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑如果你之前已经使用源仓库副本做了一部分特性开发，那么这里配置源仓库副本的目录）
+      # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑    如果你之前已经使用源仓库副本做了一部分特性开发，那么这里配置源仓库副本的目录）
       branch: 'client_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
 
 options: #其他选项
   repo_root: repo          # submodule保存根目录
   push: false              # 同步后是否push
+  # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑  第一次使用，先本地测试，不push，没问题之后再改成true
   pull_request: true       # 是否创建pull request，需要目标仓库配置token和type
   proxy_fix: true          # 是否将https代理改成http://开头，解决python开启代理时无法发出https请求的问题
   use_system_proxy: true   # 是否使用系统代理
 
 ```
-
-> 第一次使用，先本地测试，不push    
-> 本地测试同步没有问题，之后再设置options.push=true
 
 ### 4.4 初始化
 
@@ -173,7 +171,7 @@ trident init
 
 ### 4.5 进行同步
 
-将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，[你需要视情况处理PR](#合并分支)
+将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，[你需要视情况处理PR](#5-合并分支)
 
 ```shell
 # 以后你只需要定时运行这个命令，即可保持同步升级
@@ -183,6 +181,10 @@ trident sync
 运行效果
 
 ```
+root:~/sync_work_repo$ trident sync 
+.
+.
+.
 2023-01-28 14:13:41 | INFO    | - refs:[<git.Head "refs/heads/main">]
 2023-01-28 14:13:41 | WARNING | - Skip push，The remote address is not set for the current repository. Use the [trident remote <repo_url>] command to set the remote address of the repository and save the synchronization progress
 2023-01-28 14:13:41 | INFO    | - ----------------result:✅----------------
@@ -195,7 +197,7 @@ trident sync
 
 ### 4.6 [可选] 保存 sync_work_repo
 
-将`sync_work_repo`提交到远程服务器，防止更换电脑丢失同步进度。    
+将`sync_work_repo`push到远程服务器，防止更换电脑丢失同步进度。    
 后续你只需要`clone` `sync_work_repo` ，然后直接运行`trident sync`即可继续同步
 
 ```shell
@@ -215,7 +217,7 @@ git push
 你可以将 `<sync_work_repo>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
-### 4.8 合并分支
+## 5 合并分支
 
 源仓库如果有更新，那么同步完之后，将会有三种情况：
 
@@ -270,8 +272,9 @@ target:<sync_branch> -------->  target:<main_branch>
 
 总结就是六个字： 不删、少改、多加。
 
-## 5. 自动化
+## 6. 自动化
 
-### 5.1 github action
+### 6.1 GitHub Actions
+GitHub Actions 可以免费的帮你进行自动化同步操作
 
-进行中
+请参考 [certd 自动化同步示例](https://github.com/certd/certd-sync-work)

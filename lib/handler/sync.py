@@ -79,10 +79,15 @@ class SyncHandler:
         config = self.config
         os.chdir(self.work_root)
 
+        # 如果work仓库配置了remote，先pull一下
+        if 'origin' in self.repo.remotes:
+            shell("git pull")
+
         is_init = False
         ref_count = sum(1 for ref in self.repo.refs)
         if ref_count > 0:
-            # 初始化一下子项目，以防万一
+            # 判断这个仓库是否有过提交
+            # 初始化一下子项目
             shell(f"git submodule update --init --recursive --progress")
             self.repo.iter_submodules()
             sms = self.repo.submodules
