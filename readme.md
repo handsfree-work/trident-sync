@@ -4,6 +4,15 @@
 
 [中文](./readme.md)
 
+<div>
+<a href="https://gitee.com/handsfree-work/trident-sync" target="_blank"
+  ><img src="https://gitee.com/handsfree-work/trident-sync/badge/star.svg?theme=dark" alt="star"
+/></a>  
+<a href="https://github.com/handsfree-work/trident-sync" target="_blank"
+  ><img alt="GitHub stars" src="https://img.shields.io/github/stars/handsfree-work/trident-sync?logo=github"
+/></a>
+</div>
+
 ## 1. 简介
 
 当我们的项目内部使用了其他项目进行二次开发，那么这个模块就只能停留在当时的版本，无法方便的更新。
