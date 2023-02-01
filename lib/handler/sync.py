@@ -104,13 +104,6 @@ class SyncHandler:
         is_init = False
         ref_count = sum(1 for ref in self.repo.refs)
         if ref_count > 0:
-            # 判断这个仓库是否有过提交
-            try:
-                shell(f"git submodule foreach git checkout .")
-                shell(f"git submodule foreach git clean -f")
-            except Exception as e:
-                logger.warning('clean submodules failed')
-
             # 初始化一下子项目
             shell(f"git submodule update --init --recursive --progress")
             self.repo.iter_submodules()
@@ -200,9 +193,9 @@ class TaskExecutor:
         # 创建同步分支，并checkout
         is_first = checkout_branch(self.repo_target, self.task_target.branch)
         # 开始复制文件
-        os.chdir(self.work_root)
+
         self.do_sync(is_first)
-        os.chdir(self.repo_target.working_dir)
+
         # 提交代码
         self.do_commit()
         # push更新
@@ -266,7 +259,9 @@ class TaskExecutor:
             shutil.rmtree(dir_target_sync)
             time.sleep(0.2)
         logger.info(f"copy files")
+        os.chdir(self.work_root)
         sync_func(self.sync_task, dir_src_sync, dir_target_sync)
+        os.chdir(self.repo_target.working_dir)
         git_file = f"{dir_target_sync}/.git"
         if os.path.exists(git_file):
             os.unlink(git_file)

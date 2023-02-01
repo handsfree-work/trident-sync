@@ -22,7 +22,7 @@ sync: # 同步配置，可以配置多个同步任务
       allow_reset_to_root: true     # 是否允许重置同步分支到root commit记录，第一次同步时需要找到target.dir是一个空目录的commit，确保后续合并时不会丢失变更，root commit大概率应该是空目录
       remove_dir_before_copy: true  # 复制文件前是否删除target.dir，如果target.dir与src.dir是相同的，保持默认true即可
       branch: 'test_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
-    copy_script: ../../copy_script.py   # 自定义同步脚本，不配置则整个目录复制，脚本中应定义方法:copy(task: {key,src:{上方配置},target:{上方配置}}, src_dir:str, target_dir:str)
+    copy_script: ../../../copy_script.py   # 自定义同步脚本，不配置则整个目录复制，脚本中应定义方法:copy(task: {key,src:{上方配置},target:{上方配置}}, src_dir:str, target_dir:str)
 
 options: #选项
   repo_root: repo          # submodule保存根目录
