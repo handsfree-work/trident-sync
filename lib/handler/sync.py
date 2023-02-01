@@ -209,8 +209,6 @@ class TaskExecutor:
         has_push = self.do_push()
         # 创建PR
         self.do_pull_request(has_push)
-        # 切换回主分支
-        force_checkout_main_branch(self.task_target.repo_ref)
 
         logger.info(text_center(f"【{self.key}】 task complete"))
         self.sync_task.status.success = True
@@ -218,10 +216,11 @@ class TaskExecutor:
         self.repo_target.close()
 
     def pull_src_repo(self):
+        os.chdir(self.repo_src.working_dir)
         logger.info(f"update src repo :{self.task_src.repo_ref.url}")
-        shell(f"cd {self.repo_src.working_dir} && git checkout {self.task_src.repo_ref.branch} -f && git pull")
+        shell(f"git clean . && git checkout . && git checkout {self.task_src.repo_ref.branch} -f && git pull")
         logger.info(f"update submodule of src repo")
-        shell(f"cd {self.repo_src.working_dir} && git submodule update --init --recursive --progress ")
+        shell(f"git submodule update --init --recursive --progress ")
         logger.info(f"update src repo success")
 
     def do_sync(self, is_first):
