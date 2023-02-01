@@ -100,7 +100,7 @@ class SyncHandler:
         logger.info(text_center("sync start"))
         config = self.config
         os.chdir(self.work_root)
-
+        shell("git clean -f")
         # 如果work仓库配置了remote，先pull一下
         for remote in self.repo.remotes:
             print(remote)
