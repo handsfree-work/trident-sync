@@ -100,7 +100,11 @@ class SyncHandler:
         logger.info(text_center("sync start"))
         config = self.config
         os.chdir(self.work_root)
+        # 先还原变更
+        logger.info("recovery files")
+        shell("git checkout .")
         shell("git clean -f")
+
         # 如果work仓库配置了remote，先pull一下
         for remote in self.repo.remotes:
             print(remote)
@@ -114,6 +118,8 @@ class SyncHandler:
         ref_count = sum(1 for ref in self.repo.refs)
         if ref_count > 0:
             # 判断这个仓库是否有过提交
+            shell(f"git submodule foreach git checkout .")
+            shell(f"git submodule foreach git clean -f")
             # 初始化一下子项目
             shell(f"git submodule update --init --recursive --progress")
             self.repo.iter_submodules()
