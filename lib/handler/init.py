@@ -1,4 +1,3 @@
-import datetime
 import os
 import time
 
@@ -8,8 +7,7 @@ from lib.handler.helper import save_work_repo
 from lib.logger import logger
 from lib.model.config import Config
 from lib.model.repo import RepoConf
-from lib.util import shell, save_file, check_need_push
-from lib.util_git import add_and_commit, get_git_modify_file_count
+from lib.util import shell, save_file
 
 
 class InitHandler:

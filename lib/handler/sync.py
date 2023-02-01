@@ -52,7 +52,29 @@ def sync_func(task: SyncTask, src_dir, target_dir):
     if task.copy_script is None or task.copy_script.strip() == '':
         shutil.copytree(src_dir, target_dir)
     else:
-        exec(task.copy_script)
+        if len(task.copy_script.splitlines()) > 1:
+            # 多行 则表示是脚本，直接执行
+            exec(task.copy_script)
+        else:
+            # 单行，表示是文件，加载文件模块，并执行copy方法
+            filepath = os.path.abspath(task.copy_script)
+            do_copy_from_file_module(filepath, task, src_dir, target_dir)
+
+
+def do_copy_from_file_module(filepath, task: SyncTask, src_dir, target_dir):
+    # 加载文件模块，并执行copy方法
+    import importlib.util
+    import sys
+    # For illustrative purposes.
+    import tokenize
+    file_path = tokenize.__file__
+    module_name = tokenize.__name__
+
+    spec = importlib.util.spec_from_file_location('copy', filepath)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    module.copy(task, src_dir, target_dir)
 
 
 class SyncHandler:
@@ -80,8 +102,13 @@ class SyncHandler:
         os.chdir(self.work_root)
 
         # 如果work仓库配置了remote，先pull一下
+        for remote in self.repo.remotes:
+            print(remote)
         if 'origin' in self.repo.remotes:
-            shell("git pull")
+            try:
+                shell("git pull")
+            except Exception as e:
+                logger.warning('git pull failed')
 
         is_init = False
         ref_count = sum(1 for ref in self.repo.refs)
@@ -143,9 +170,9 @@ class SyncHandler:
 
 
 class TaskExecutor:
-    def __init__(self, root, config: Config, status: dict, sms, http, sync_task: SyncTask):
+    def __init__(self, work_root, config: Config, status: dict, sms, http, sync_task: SyncTask):
         self.key = sync_task.key
-        self.root = root
+        self.work_root = work_root
         self.sync_task = sync_task
         self.sms = sms
         self.task_src = sync_task.src
@@ -176,7 +203,9 @@ class TaskExecutor:
         # 创建同步分支，并checkout
         is_first = checkout_branch(self.repo_target, self.task_target.branch)
         # 开始复制文件
+        os.chdir(self.work_root)
         self.do_sync(is_first)
+        os.chdir(self.repo_target.working_dir)
         # 提交代码
         self.do_commit()
         # push更新
@@ -208,12 +237,13 @@ class TaskExecutor:
             raise Exception(
                 f"The src repo dir <{dir_src_sync}> is empty. It may not be fully initialized. Try to enter this directory and execute the [git pull] command")
 
+        remove_target_dir = True
         if is_first:
             # 第一次同步，目标目录必须为空
             target_is_blank = is_blank_dir(dir_target_sync)
             if not target_is_blank:
                 logger.warning(
-                    f"For the first time, the target repo dir <{dir_src_sync}> is not empty")
+                    f"For the first time, the target repo dir <{dir_target_sync}> is not empty")
                 logger.warning(
                     f"Please make sure that the dir is a copy of a version of the src repo, otherwise please change the directory!!")
                 logger.warning(
@@ -223,22 +253,26 @@ class TaskExecutor:
                     directory.")
                 if not self.task_target.allow_reset_to_root:
                     raise Exception(
-                        f"the target repo dir <{dir_src_sync}> is not empty, and allow_reset_to_root is False")
+                        f"the target repo dir <{dir_target_sync}> is not empty, and allow_reset_to_root is False")
                 else:
                     logger.info(f"The allow_reset_to_root is True, Trying to reset the sync_branch to root commit")
                     root_hash = shell("git rev-list --max-parents=0 HEAD", get_out=True)
                     shell(f"git reset {root_hash.strip()}")
                     shell("git clean -df ")
+                    logger.info(f"Reset the sync_branch to root commit success")
                     # 再次检测目录是否为空
                     target_is_blank = is_blank_dir(dir_target_sync)
                     if not target_is_blank:
-                        raise Exception(
-                            f"The target repository directory <{dir_src_sync}> is still not empty, please change the directory")
+                        logger.warning(
+                            f"The target repository directory <{dir_target_sync}> is still not empty, Some changes may be lost!!!")
+                        # 此时不移除目标目录
+                        remove_target_dir = False
 
-        if os.path.exists(dir_target_sync):
+        if remove_target_dir and os.path.exists(dir_target_sync):
+            logger.info(f"remove <{dir_target_sync}> ...")
             shutil.rmtree(dir_target_sync)
             time.sleep(0.2)
-
+        logger.info(f"copy files")
         sync_func(self.sync_task, dir_src_sync, dir_target_sync)
         git_file = f"{dir_target_sync}/.git"
         if os.path.exists(git_file):
@@ -277,7 +311,7 @@ class TaskExecutor:
 
             set_dict_value(self.status, f"sync.{key}.last_commit_src", src_last_hash)
             set_dict_value(self.status, f"sync.{key}.last_commit_target", target_last_hash)
-            save_status(self.root, self.status)
+            save_status(self.work_root, self.status)
             self.sync_task.status.commit = True
             return True
 
