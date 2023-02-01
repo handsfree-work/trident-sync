@@ -19,7 +19,8 @@ sync: # 同步配置，可以配置多个同步任务
     target: #目标仓库
       repo: target                  # 目标仓库名称，上面repo配置的仓库名称引用
       dir: 'package/sync-src'       # 接收src同步过来的目录
-      allow_reset_to_root: true     # 是否允许重置同步分支到root commit记录
+      allow_reset_to_root: true     # 是否允许重置同步分支到root commit记录，第一次同步时需要使用一个空目录，确保后续合并时不会丢失变更，root commit应该是空目录
+      remove_dir_before_copy: true  # 复制文件前是否删除目录，如果target.dir与src.dir是完全相同的，保持默认true即可
       branch: 'test_sync'           # 同步分支名称（需要配置一个未被占用的分支名称）
     copy_script: ../../copy_script.py   # 自定义同步脚本，不配置则整个目录复制，脚本中应定义方法:copy(task: {key,src:{上方配置},target:{上方配置}}, src_dir:str, target_dir:str)
 

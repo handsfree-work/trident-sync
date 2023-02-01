@@ -29,6 +29,7 @@ class SyncTaskTarget:
     dir: str = None
     branch: str = None
     allow_reset_to_root: bool = True
+    remove_dir_before_copy: bool = True
     repo_ref: RepoConf
 
     def __init__(self, conf_dict):
