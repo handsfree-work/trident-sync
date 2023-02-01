@@ -36,7 +36,7 @@ def get_git_modify_file_count():
 
 def force_checkout_main_branch(conf_repo_ref: RepoConf):
     # 切换回主分支
-    shell(f"git clean . && git checkout . && git checkout -f {conf_repo_ref.branch}")
+    shell(f"git clean -f && git checkout . && git checkout -f {conf_repo_ref.branch}")
     time.sleep(1)
 
 

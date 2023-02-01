@@ -218,7 +218,7 @@ class TaskExecutor:
     def pull_src_repo(self):
         os.chdir(self.repo_src.working_dir)
         logger.info(f"update src repo :{self.task_src.repo_ref.url}")
-        shell(f"git clean . && git checkout . && git checkout {self.task_src.repo_ref.branch} -f && git pull")
+        shell(f"git clean -f && git checkout . && git checkout {self.task_src.repo_ref.branch} -f && git pull")
         logger.info(f"update submodule of src repo")
         shell(f"git submodule update --init --recursive --progress ")
         logger.info(f"update src repo success")
