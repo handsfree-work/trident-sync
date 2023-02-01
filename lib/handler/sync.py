@@ -123,7 +123,7 @@ class SyncHandler:
             raise Exception("Not initialized yet, please execute the [trident init] command first")
 
         sync_task_map = config.sync
-
+        sms = self.repo.submodules
         try:
             for key in sync_task_map:
                 sync_task: SyncTask = sync_task_map[key]
