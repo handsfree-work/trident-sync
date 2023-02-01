@@ -15,6 +15,13 @@ def save_work_repo(repo: Repo, message, push=True, status: RunStatus = None):
     if status is None:
         status = RunStatus()
     count = get_git_modify_file_count()
+
+    if 'origin' in repo.remotes:
+        try:
+            shell("git pull")
+        except Exception as e:
+            logger.warning('git pull failed')
+
     if count <= 0:
         logger.info("No modification, no need to submit")
     else:

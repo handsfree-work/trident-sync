@@ -100,17 +100,7 @@ class SyncHandler:
         logger.info(text_center("sync start"))
         config = self.config
         os.chdir(self.work_root)
-        save_work_repo(self.repo, "save work repo before sync", self.config.options.push)
-
-        # 如果work仓库配置了remote，先pull一下
-        for remote in self.repo.remotes:
-            print(remote)
-        if 'origin' in self.repo.remotes:
-            try:
-                shell("git pull")
-            except Exception as e:
-                logger.warning('git pull failed')
-
+        # save_work_repo(self.repo, "save work repo before sync", self.config.options.push)
         is_init = False
         ref_count = sum(1 for ref in self.repo.refs)
         if ref_count > 0:
@@ -229,7 +219,7 @@ class TaskExecutor:
 
     def pull_src_repo(self):
         logger.info(f"update src repo :{self.task_src.repo_ref.url}")
-        shell(f"cd {self.repo_src.working_dir} && git checkout {self.task_src.repo_ref.branch} && git pull")
+        shell(f"cd {self.repo_src.working_dir} && git checkout {self.task_src.repo_ref.branch} -f && git pull")
         logger.info(f"update submodule of src repo")
         shell(f"cd {self.repo_src.working_dir} && git submodule update --init --recursive --progress ")
         logger.info(f"update src repo success")
