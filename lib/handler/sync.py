@@ -234,7 +234,6 @@ class TaskExecutor:
             raise Exception(
                 f"The src repo dir <{dir_src_sync}> is empty. It may not be fully initialized. Try to enter this directory and execute the [git pull] command")
 
-        remove_target_dir = True
         if is_first:
             # 第一次同步，目标目录必须为空
             target_is_blank = is_blank_dir(dir_target_sync)
@@ -261,11 +260,9 @@ class TaskExecutor:
                     target_is_blank = is_blank_dir(dir_target_sync)
                     if not target_is_blank:
                         logger.warning(
-                            f"The target repository directory <{dir_target_sync}> is still not empty, Some changes may be lost!!!")
-                        # 此时不移除目标目录
-                        remove_target_dir = False
+                            f"The target repository directory <{dir_target_sync}> is still not empty, Some changes maybe lost !!!")
 
-        if remove_target_dir and os.path.exists(dir_target_sync):
+        if self.task_target.remove_dir_before_copy and os.path.exists(dir_target_sync):
             logger.info(f"remove <{dir_target_sync}> ...")
             shutil.rmtree(dir_target_sync)
             time.sleep(0.2)
