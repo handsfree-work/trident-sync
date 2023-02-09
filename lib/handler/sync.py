@@ -70,7 +70,7 @@ def do_copy_from_file_module(filepath, task: SyncTask, src_dir, target_dir):
     file_path = tokenize.__file__
     module_name = tokenize.__name__
 
-    spec = importlib.util.spec_from_file_location('copy', filepath)
+    spec = importlib.util.spec_from_file_location('copy_script', filepath)
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
@@ -253,6 +253,8 @@ class TaskExecutor:
                     if not target_is_blank:
                         logger.warning(
                             f"The target repository directory <{dir_target_sync}> is still not empty, Some changes maybe lost !!!")
+                logger.info("after 5 seconds will be continue")
+                time.sleep(5)
 
         if self.task_target.remove_dir_before_copy and os.path.exists(dir_target_sync):
             logger.info(f"remove <{dir_target_sync}> ...")
