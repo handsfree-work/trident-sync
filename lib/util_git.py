@@ -27,7 +27,10 @@ def get_git_modify_file_count():
     for line in lines:
         start = line.find(':   ')
         if start < 0:
-            continue
+            start = line.find('：   ')
+            # TODO 兼容一下mac版 git中文国际化之后变成了这个冒号
+            if start < 0:
+                continue
         start += 1
         file = line[start:].strip()
         count += 1
