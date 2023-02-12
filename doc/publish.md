@@ -1,6 +1,6 @@
 
 ```shell
 poetry build
-poetry publish --username=greper --password=xxxx --build 
+poetry publish --build  --username=greper --password=xxxx 
 
 ```
