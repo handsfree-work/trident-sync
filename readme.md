@@ -181,7 +181,10 @@ trident init
 
 ### 4.5 进行同步
 
-将根据`sync.yaml`中`sync`配置的同步任务进行同步更新，并提交PR，[你需要视情况处理PR](#5-合并分支)
+执行同步命令，将根据`sync.yaml`中`sync`配置的任务进行同步    
+你将得到一个与源项目文件完全一致的同步分支（`client_sync`）。     
+之后你需要将`client_sync`分支合并到你的开发主分支。    
+如果配置了`push=true`、`token`、`type`，会自动提交PR来合并，[你需要视情况处理PR](#5-合并同步分支)
 
 ```shell
 # 以后你只需要定时运行这个命令，即可保持同步升级
@@ -205,6 +208,8 @@ root:~/sync_work_repo$ trident sync
 
 > 注意：不要在同步分支内写你自己的任何代码（示例配置中为`client_sync`分支）
 
+
+
 ### 4.6 [可选] 保存 sync_work_repo
 
 将`sync_work_repo`push到远程服务器，防止更换电脑丢失同步进度。    
@@ -227,7 +232,7 @@ git push
 你可以将 `<sync_work_repo>` 这个远程仓库和 `trident sync` 命令配置到任何`CI/DI`工具（例如jenkins、github
 action、drone等）自动定时同步
 
-## 5 合并分支
+## 5 合并同步分支
 
 源仓库如果有更新，那么同步完之后，将会有三种情况：
 
